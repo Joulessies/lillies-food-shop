@@ -1,0 +1,153 @@
+.checkout-page {
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+}
+
+.checkout-page h1 {
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.checkout-page h3 {
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.checkout-page .card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.checkout-page .form-label {
+  font-weight: 500;
+  color: #555;
+}
+
+.checkout-page .form-control {
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.checkout-page .form-control:focus {
+  border-color: #ff872e;
+  box-shadow: 0 0 0 0.2rem rgba(255, 135, 46, 0.2);
+}
+
+.checkout-page .btn-primary {
+  background-color: #ff872e;
+  border-color: #ff872e;
+  padding: 0.7rem 1.5rem;
+  font-weight: 500;
+}
+
+.checkout-page .btn-primary:hover,
+.checkout-page .btn-primary:focus {
+  background-color: #e67521;
+  border-color: #e67521;
+}
+
+.order-summary {
+  position: sticky;
+  top: 30px;
+}
+
+.total-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.total-section h4 {
+  font-weight: 600;
+  color: #333;
+}
+
+.payment-details {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  background-color: #f9f9f9;
+}
+
+/* Payment method styling */
+.form-check {
+  padding-left: 2.5rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+#gcash-payment + .form-check-label::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-image: url('https://www.gcash.com/wp-content/uploads/2019/05/GCash-Logo-PNG-1024x1024.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-right: 10px;
+}
+
+#maya-payment + .form-check-label::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-image: url('https://mms.businesswire.com/media/20220428005502/en/1440472/5/Maya_Logo_Colored.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-right: 10px;
+}
+
+.payment-details.gcash-details {
+  border-color: #0074e4;
+  background-color: rgba(0, 116, 228, 0.05);
+}
+
+.payment-details.maya-details {
+  border-color: #5cc16a;
+  background-color: rgba(92, 193, 106, 0.05);
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Order Confirmation Styles */
+.order-confirmation .card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.confirmation-icon {
+  font-size: 5rem;
+  color: #4caf50;
+  margin-bottom: 1.5rem;
+}
+
+.order-number {
+  background-color: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .order-summary {
+    position: static;
+    margin-top: 2rem;
+  }
+}

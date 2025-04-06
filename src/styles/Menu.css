@@ -1,0 +1,137 @@
+.menu-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.menu-page h1 {
+  color: #0076f6;
+  font-weight: 700;
+}
+
+.category-title {
+  color: #0076f6;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f0f0f0;
+  margin-bottom: 1.5rem;
+}
+
+.menu-item-card {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-item-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-color: #0076f6;
+}
+
+.menu-item-card .card-img-top {
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.menu-item-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.menu-price {
+  font-weight: 700;
+  color: #ff4500;
+  font-size: 1.1rem;
+}
+
+.card-title {
+  font-weight: 600;
+  color: #333;
+}
+
+.card-text {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.view-item-btn {
+  background-color: #0076f6;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.view-item-btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+/* Modal Styles */
+.modal-item-image {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.modal-item-price {
+  color: #ff4500;
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.modal-item-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 1.5rem;
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.quantity-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 0 1rem;
+}
+
+.total-price {
+  color: #0076f6;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.modal-footer .btn-primary {
+  background-color: #0076f6;
+  border: none;
+  padding: 0.5rem 1.5rem;
+}
+
+.modal-footer .btn-primary:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .menu-page {
+    padding: 0 1rem;
+  }
+
+  .menu-item-card {
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-item-image {
+    margin-bottom: 1.5rem;
+  }
+}
