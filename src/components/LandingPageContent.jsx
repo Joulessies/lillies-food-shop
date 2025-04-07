@@ -1,67 +1,56 @@
-import '../styles/LandingPageContent.css';
-import Image2 from '../assets/images/1.webp';
-import { Image, Row, Col, Container, Button } from 'react-bootstrap';
-import FeaturedSwiper from '../components/Swiper';
-import Image3 from '../assets/images/people_eating.jpg';
-import Image4 from '../assets/images/people_eating1.jpeg';
-import Image5 from '../assets/images/people-eating2.jpg';
-import Image6 from '../assets/images/burger_discount.webp';
-import Image7 from '../assets/images/frenchfry_discount1.jpg';
-import Marquee from 'react-fast-marquee';
+import "../styles/LandingPageContent.css";
+import { Image, Row, Col, Container, Button } from "react-bootstrap";
+import FeaturedSwiper from "../components/Swiper";
+import Marquee from "react-fast-marquee";
 
 // Customer reviews data
 const reviewsData = [
   {
-    name: 'John Doe',
-    title: 'Regular Customer',
-    image: Image2,
+    name: "John Doe",
+    title: "Regular Customer",
     rating: 5,
     comment:
-      'The burgers here are absolutely amazing! The quality of ingredients and the taste is unmatched. My go-to place for a delicious meal.',
-    date: 'March 15, 2024',
+      "The burgers here are absolutely amazing! The quality of ingredients and the taste is unmatched. My go-to place for a delicious meal.",
+    date: "March 15, 2024",
   },
   {
-    name: 'Sarah Smith',
-    title: 'Food Enthusiast',
-    image: Image2,
+    name: "Sarah Smith",
+    title: "Food Enthusiast",
     rating: 5,
     comment:
-      'Great atmosphere and even better food! The staff is friendly and the service is quick. Love their special sauce!',
-    date: 'March 18, 2024',
+      "Great atmosphere and even better food! The staff is friendly and the service is quick. Love their special sauce!",
+    date: "March 18, 2024",
   },
   {
-    name: 'Mike Johnson',
-    title: 'Foodie',
-    image: Image2,
+    name: "Mike Johnson",
+    title: "Foodie",
     rating: 5,
     comment:
-      'The combo meals are perfect for sharing with friends. Great value for money and the taste is consistently good!',
-    date: 'March 20, 2024',
+      "The combo meals are perfect for sharing with friends. Great value for money and the taste is consistently good!",
+    date: "March 20, 2024",
   },
   {
-    name: 'Emily Wilson',
-    title: 'First-time Visitor',
-    image: Image2,
+    name: "Emily Wilson",
+    title: "First-time Visitor",
     rating: 5,
     comment:
-      'Had lunch here for the first time yesterday and was blown away! The burgers are juicy and the fries are perfectly crispy.',
-    date: 'March 22, 2024',
+      "Had lunch here for the first time yesterday and was blown away! The burgers are juicy and the fries are perfectly crispy.",
+    date: "March 22, 2024",
   },
   {
-    name: 'David Brown',
-    title: 'Burger Lover',
-    image: Image2,
+    name: "David Brown",
+    title: "Burger Lover",
     rating: 5,
     comment:
       "I've tried burgers all over town, but this place is special. The ingredients are fresh and the flavors are incredible.",
-    date: 'March 25, 2024',
+    date: "March 25, 2024",
   },
 ];
 
 // Functionality: Render on the Star Ratings
 export default function LandingPageContent() {
   const renderStars = (count) => {
-    return '★'.repeat(count);
+    return "★".repeat(count);
   };
 
   return (
@@ -89,10 +78,10 @@ export default function LandingPageContent() {
           </Col>
           <Col md={6} className="image-content">
             <div className="image-grid">
-              <Image src={Image2} className="image-carousel" />
-              <Image src={Image2} className="image-carousel" />
-              <Image src={Image2} className="image-carousel" />
-              <Image src={Image2} className="image-carousel" />
+              <Image className="image-carousel" />
+              <Image className="image-carousel" />
+              <Image className="image-carousel" />
+              <Image className="image-carousel" />
             </div>
           </Col>
         </Row>
@@ -111,21 +100,21 @@ export default function LandingPageContent() {
           <Container>
             <Row>
               <Col>
-                <Image src={Image3} className="featured-landing-page" />
+                <Image className="featured-landing-page" />
                 <div className="featured-text">
                   <h3>Dining Experience</h3>
                   <p>Enjoy our delicious meals in a cozy atmosphere</p>
                 </div>
               </Col>
               <Col>
-                <Image src={Image4} className="featured-landing-page" />
+                <Image className="featured-landing-page" />
                 <div className="featured-text">
                   <h3>Share with Friends</h3>
                   <p>Enjoy our delicious meals in a cozy atmosphere</p>
                 </div>
               </Col>
               <Col>
-                <Image src={Image5} className="featured-landing-page" />
+                <Image className="featured-landing-page" />
                 <div className="featured-text">
                   <h3>Share with loved ones</h3>
                   <p>Enjoy your delicious meals with your loved ones</p>
@@ -134,14 +123,14 @@ export default function LandingPageContent() {
             </Row>
             <Row>
               <Col>
-                <Image src={Image6} className="featured-landing-page" />
+                <Image className="featured-landing-page" />
                 <div className="featured-text">
                   <h3>Burger Discount</h3>
                   <p>Delicious burger at a discount</p>
                 </div>
               </Col>
               <Col>
-                <Image src={Image7} className="featured-landing-page" />
+                <Image className="featured-landing-page" />
                 <div className="featured-text">
                   <h3>French Fries Discount</h3>
                   <p>Crispy fries at a special price</p>
@@ -160,7 +149,6 @@ export default function LandingPageContent() {
             {reviewsData.map((review, index) => (
               <div className="review-card" key={index}>
                 <div className="review-header">
-                  <Image src={review.image} className="reviewer-image" />
                   <div className="reviewer-info">
                     <h3>{review.name}</h3>
                     <p>{review.title}</p>
@@ -186,10 +174,10 @@ export default function LandingPageContent() {
           >
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '2rem',
-                padding: '0 2rem',
+                display: "flex",
+                alignItems: "center",
+                gap: "2rem",
+                padding: "0 2rem",
               }}
             >
               <span className="order-now-text">ORDER NOW</span>
@@ -197,10 +185,10 @@ export default function LandingPageContent() {
             </div>
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '2rem',
-                padding: '0 2rem',
+                display: "flex",
+                alignItems: "center",
+                gap: "2rem",
+                padding: "0 2rem",
               }}
             >
               <span className="order-now-text">ORDER NOW</span>
@@ -208,10 +196,10 @@ export default function LandingPageContent() {
             </div>
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '2rem',
-                padding: '0 2rem',
+                display: "flex",
+                alignItems: "center",
+                gap: "2rem",
+                padding: "0 2rem",
               }}
             >
               <span className="order-now-text">ORDER NOW</span>

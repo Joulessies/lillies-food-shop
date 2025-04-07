@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import {
   Container,
   Row,
@@ -7,17 +7,34 @@ import {
   Modal,
   Button,
   Form,
-} from 'react-bootstrap';
-import '../../styles/Menu.css';
-import { useCart } from '../../context/CartContext';
+  Alert,
+} from "react-bootstrap";
+import "../../styles/Menu.css";
+import { useCart } from "../../context/CartContext";
 
 const Menu = () => {
   // State for modal
   const [show, setShow] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [showAlert, setShowAlert] = useState(false);
+  const audioRef = useRef(null);
 
   const { addToCart } = useCart();
+
+  useEffect(() => {
+    // Initialize audio when component mounts
+    audioRef.current = new Audio("/success-sound.mp3");
+    audioRef.current.load(); // Preload the audio
+
+    // Cleanup on unmount
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   const handleShow = (item) => {
     setSelectedItem(item);
@@ -34,93 +51,105 @@ const Menu = () => {
   // Handle adding to cart
   const handleAddToCart = () => {
     addToCart(selectedItem, quantity);
+    try {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0; // Reset audio to start
+        audioRef.current.play().catch((error) => {
+          console.error("Error playing sound:", error);
+        });
+      }
+    } catch (error) {
+      console.error("Error with audio:", error);
+    }
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
     handleClose();
   };
 
-  // Sample menu data
+  // Functionality: Store the Menu Data
   const menuItems = [
     {
       id: 1,
-      category: 'Burgers',
+      category: "Burgers",
       items: [
         {
           id: 101,
-          name: 'Classic Burger',
+          name: "Classic Burger",
           description:
-            'Beef patty, lettuce, tomato, onion, and special sauce on a potato bun',
-          price: 8.99,
-          image: 'https://via.placeholder.com/300x200',
+            "Beef patty, lettuce, tomato, onion, and special sauce on a potato bun",
+          price: 120,
+          image: "https://via.placeholder.com/300x200",
         },
         {
           id: 102,
-          name: 'Cheese Burger',
+          name: "Cheese Burger",
           description:
-            'Beef patty, cheddar cheese, lettuce, tomato, onion, and special sauce',
-          price: 9.99,
-          image: 'https://via.placeholder.com/300x200',
+            "Beef patty, cheddar cheese, lettuce, tomato, onion, and special sauce",
+          price: 130,
+          image: "https://via.placeholder.com/300x200",
         },
         {
-          id: 103,
-          name: 'Bacon Burger',
+          id: 140,
+          name: "Bacon Burger",
           description:
-            'Beef patty, bacon, lettuce, tomato, onion, and special sauce',
-          price: 10.99,
-          image: 'https://via.placeholder.com/300x200',
+            "Beef patty, bacon, lettuce, tomato, onion, and special sauce",
+          price: 100,
+          image: "https://via.placeholder.com/300x200",
         },
       ],
     },
     {
       id: 2,
-      category: 'Sides',
+      category: "Sides",
       items: [
         {
           id: 201,
-          name: 'French Fries',
+          name: "French Fries",
           description:
-            'Crispy golden french fries with our signature seasoning',
-          price: 3.99,
-          image: 'https://via.placeholder.com/300x200',
+            "Crispy golden french fries with our signature seasoning",
+          price: 100,
+          image: "https://via.placeholder.com/300x200",
         },
         {
           id: 202,
-          name: 'Onion Rings',
-          description: 'Crispy battered onion rings served with dipping sauce',
-          price: 4.99,
-          image: 'https://via.placeholder.com/300x200',
+          name: "Onion Rings",
+          description: "Crispy battered onion rings served with dipping sauce",
+          price: 140,
+          image: "https://via.placeholder.com/300x200",
         },
         {
           id: 203,
-          name: 'Coleslaw',
-          description: 'Fresh cabbage, carrots, and our special dressing',
-          price: 2.99,
-          image: 'https://via.placeholder.com/300x200',
+          name: "Coleslaw",
+          description: "Fresh cabbage, carrots, and our special dressing",
+          price: 110,
+          image: "https://via.placeholder.com/300x200",
         },
       ],
     },
     {
       id: 3,
-      category: 'Beverages',
+      category: "Beverages",
       items: [
         {
           id: 301,
-          name: 'Soft Drinks',
-          description: 'Choose from a variety of refreshing beverages',
-          price: 1.99,
-          image: 'https://via.placeholder.com/300x200',
+          name: "Soft Drinks",
+          description: "Choose from a variety of refreshing beverages",
+          price: 70,
+          image: "https://via.placeholder.com/300x200",
         },
         {
           id: 302,
-          name: 'Milkshakes',
-          description: 'Creamy handcrafted milkshakes in various flavors',
-          price: 4.99,
-          image: 'https://via.placeholder.com/300x200',
+          name: "Milkshakes",
+          description: "Creamy handcrafted milkshakes in various flavors",
+          price: 70,
+          image: "https://via.placeholder.com/300x200",
         },
         {
           id: 303,
-          name: 'Iced Tea',
-          description: 'Freshly brewed iced tea, sweetened or unsweetened',
-          price: 2.49,
-          image: 'https://via.placeholder.com/300x200',
+          name: "Iced Tea",
+          description: "Freshly brewed iced tea, sweetened or unsweetened",
+          price: 65,
+          image: "https://via.placeholder.com/300x200",
         },
       ],
     },
@@ -128,6 +157,16 @@ const Menu = () => {
 
   return (
     <Container className="menu-page py-5">
+      {showAlert && (
+        <Alert
+          variant="success"
+          onClose={() => setShowAlert(false)}
+          dismissible
+        >
+          <Alert.Heading>Success!</Alert.Heading>
+          <p>{selectedItem?.name} has been added to your cart.</p>
+        </Alert>
+      )}
       <h1 className="text-center mb-5">Our Menu</h1>
 
       {menuItems.map((category) => (
@@ -145,7 +184,7 @@ const Menu = () => {
                     <div className="d-flex justify-content-between align-items-start">
                       <Card.Title>{item.name}</Card.Title>
                       <span className="menu-price">
-                        ${item.price.toFixed(2)}
+                        ₱{item.price.toFixed(2)}
                       </span>
                     </div>
                     <Card.Text>{item.description}</Card.Text>
@@ -175,7 +214,7 @@ const Menu = () => {
                 </Col>
                 <Col md={6}>
                   <h3 className="modal-item-price">
-                    ${selectedItem.price.toFixed(2)}
+                    ₱ {selectedItem.price.toFixed(2)}
                   </h3>
                   <p className="modal-item-description">
                     {selectedItem.description}

@@ -1,0 +1,157 @@
+.navbar-custom {
+  background-color: transparent;
+  box-shadow: none;
+  padding: 1rem;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.navbar-scrolled {
+  box-shadow: none;
+  padding: 0.7rem 1rem;
+}
+
+.navbar-custom .navbar-brand {
+  font-weight: 700;
+  z-index: 1001;
+}
+
+.react-logo {
+  height: 40px;
+}
+
+.navbar-custom .navbar-toggler {
+  border: none;
+  padding: 0;
+  color: #000;
+}
+
+.navbar-custom .navbar-toggler:focus {
+  box-shadow: none;
+}
+
+.navbar-custom .nav-link {
+  color: #000;
+  font-weight: 500;
+  margin: 0 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.navbar-custom .nav-link:hover {
+  color: #ff872e;
+}
+
+.order-now-link {
+  background-color: #ff872e;
+  color: #fff !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 30px;
+  transition: background-color 0.3s ease;
+}
+
+.order-now-link:hover {
+  background-color: #e67521;
+}
+
+.cart-link {
+  color: #000;
+  border-color: rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.3s ease;
+}
+
+.cart-link:hover {
+  color: #ff872e;
+  border-color: #ff872e !important;
+}
+
+.cart-badge {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.4rem;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Dropdown styling */
+.dropdown-menu {
+  border-radius: 8px;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  padding: 0.5rem 0;
+  margin-top: 0 !important;
+  display: block;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  transform: translateY(10px);
+  z-index: 1001;
+}
+
+/* Nav item with dropdown */
+.nav-item.dropdown {
+  position: relative;
+  padding-bottom: 10px;
+}
+
+/* Show dropdown on hover */
+.nav-item.dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  padding: 0.6rem 1.5rem;
+  color: white;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(255, 135, 46, 0.2);
+  color: #ff872e;
+}
+
+.dropdown-divider {
+  margin: 0.3rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Improve the dropdown toggle appearance */
+.nav-link.dropdown-toggle {
+  position: relative;
+  padding-right: 1.5rem !important;
+}
+
+.nav-link.dropdown-toggle::after {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  transition: transform 0.2s ease;
+}
+
+/* Add hover effect for dropdown toggle */
+.nav-item.dropdown:hover .nav-link.dropdown-toggle::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+@media (max-width: 991px) {
+  .navbar-collapse {
+    background-color: rgba(0, 0, 0, 0.8);
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .navbar-custom .nav-link {
+    margin: 0.5rem 0;
+  }
+
+  .order-now-link {
+    display: inline-block;
+    margin-top: 0.5rem;
+  }
+}

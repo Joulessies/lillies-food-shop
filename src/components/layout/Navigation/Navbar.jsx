@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 import {
   Navbar,
   Nav,
@@ -7,16 +7,18 @@ import {
   Modal,
   Table,
   NavDropdown,
-} from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import '../../../styles/Navbar.css';
-import Logo from '../../../assets/images/logo.svg';
-import { useCart } from '../../../context/CartContext';
+} from "react-bootstrap";
+import { Link } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "../../../styles/Navbar.css";
+import Logo from "../../../assets/images/logo.svg";
+import { useCart } from "../../../context/CartContext";
 
 export default function NavigationBar() {
   const [showCart, setShowCart] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
   const {
     cartItems,
     removeFromCart,
@@ -24,6 +26,24 @@ export default function NavigationBar() {
     getTotalPrice,
     getItemCount,
   } = useCart();
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const offset = window.scrollY;
+      if (offset > 100) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const handleCloseCart = () => setShowCart(false);
   const handleShowCart = (e) => {
@@ -35,14 +55,17 @@ export default function NavigationBar() {
 
   // Menu categories
   const menuCategories = [
-    { name: 'Burgers', path: '/menu#burgers' },
-    { name: 'Sides', path: '/menu#sides' },
-    { name: 'Beverages', path: '/menu#beverages' },
+    { name: "Burgers", path: "/menu#burgers" },
+    { name: "Sides", path: "/menu#sides" },
+    { name: "Beverages", path: "/menu#beverages" },
   ];
 
   return (
     <>
-      <Navbar expand="lg" className="navbar-custom">
+      <Navbar
+        expand="lg"
+        className={`navbar-custom ${scrolled ? "navbar-scrolled" : ""}`}
+      >
         <Container className="d-flex justify-content-between align-items-center">
           <Navbar.Toggle aria-controls="navbar-nav" className="order-1">
             <i className="bi bi-list"></i>
