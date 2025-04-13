@@ -8,7 +8,7 @@ import {
   Table,
   NavDropdown,
 } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../../styles/Navbar.css";
@@ -18,6 +18,7 @@ import { useCart } from "../../../context/CartContext";
 export default function NavigationBar() {
   const [showCart, setShowCart] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
 
   const {
     cartItems,
@@ -59,6 +60,11 @@ export default function NavigationBar() {
     { name: "Sides", path: "/menu#sides" },
     { name: "Beverages", path: "/menu#beverages" },
   ];
+
+  const handleContinueShopping = () => {
+    setShowCart(false);
+    navigate("/menu");
+  };
 
   return (
     <>
@@ -214,7 +220,7 @@ export default function NavigationBar() {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseCart}>
+          <Button variant="secondary" onClick={handleContinueShopping}>
             Continue Shopping
           </Button>
           <Button

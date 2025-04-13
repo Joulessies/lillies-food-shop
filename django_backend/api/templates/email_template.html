@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        color: #0076f6;
+        margin-bottom: 20px;
+      }
+      .order-summary {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      .item {
+        margin-bottom: 10px;
+      }
+      .total {
+        font-weight: bold;
+        margin-top: 20px;
+        font-size: 1.1em;
+      }
+      .delivery-info {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #e9ecef;
+        border-radius: 8px;
+      }
+      .footer {
+        margin-top: 30px;
+        color: #666;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2 class="header">Thank you for your order!</h2>
+      <p>Dear {{ customer_name }},</p>
+      <p>We have received your order and it is being processed.</p>
+
+      <div class="order-summary">
+        <h3>Order Summary</h3>
+        {% for item in items %}
+        <div class="item">
+          <strong>{{ item.name }}</strong> - {{ item.quantity }} x ${{
+          item.price }}
+        </div>
+        {% endfor %}
+        <div class="total">Total Amount: ${{ total }}</div>
+      </div>
+
+      <div class="delivery-info">
+        <h3>Delivery Details</h3>
+        <p>Delivery Method: {{ delivery_method }}</p>
+        <p>Phone: {{ phone }}</p>
+        {% if delivery_method == 'delivery' %}
+        <p>Delivery Address: {{ address }}</p>
+        {% else %}
+        <p>Pickup at our store</p>
+        {% endif %}
+      </div>
+
+      <p>We will notify you once your order is ready.</p>
+      <p>
+        If you have any questions, please contact us at
+        hello@lilliesfoodshop.com
+      </p>
+
+      <div class="footer">
+        <p>Best regards,<br />Lillies Food Shop Team</p>
+      </div>
+    </div>
+  </body>
+</html>

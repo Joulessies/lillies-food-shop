@@ -10,10 +10,17 @@ import RateUs from "./components/pages/RateUs";
 import Order from "./components/pages/Order";
 import Footer from "./components/layout/Footer/Footer";
 import { CartProvider } from "./context/CartContext";
+import { useEffect } from "react";
+import lenis from "./utils/lenis";
+import EmailTest from "./EmailTest";
 
 function App() {
+  useEffect(() => {
+    lenis;
+  }, []);
+
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <CartProvider>
         <div className="app-container">
           <div className="navbar-container">
@@ -37,6 +44,7 @@ function App() {
             <Route path="/menu" element={<Menu />} />
             <Route path="/rateus" element={<RateUs />} />
             <Route path="/order" element={<Order />} />
+            <Route path="/email-test" element={<EmailTest />} />
           </Routes>
           <Footer />
         </div>
