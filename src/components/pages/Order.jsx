@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Container,
   Row,
@@ -7,31 +7,35 @@ import {
   Button,
   Card,
   Alert,
-} from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
-import '../../styles/Order.css';
+} from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
+import { sendOrderConfirmation } from "../../services/emailService";
+import "../../styles/Order.css";
 
 const Order = () => {
   const { cartItems, getTotalPrice, clearCart } = useCart();
   const navigate = useNavigate();
 
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [orderNumber, setOrderNumber] = useState('');
+  const [orderNumber, setOrderNumber] = useState("");
   const [validated, setValidated] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('gcash');
+  const [paymentMethod, setPaymentMethod] = useState("gcash");
+  const [orderStatus, setOrderStatus] = useState(null);
 
   // Form fields state
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    zipCode: '',
-    paymentNumber: '',
-    accountName: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    zipCode: "",
+    paymentNumber: "",
+    accountName: "",
+    name: "",
+    deliveryMethod: "pickup",
   });
 
   const handleChange = (e) => {
@@ -42,25 +46,99 @@ const Order = () => {
     });
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setValidated(true);
 
-    const form = event.currentTarget;
+    // Form validation
+    const form = e.currentTarget;
     if (form.checkValidity() === false) {
-      event.stopPropagation();
-      setValidated(true);
+      e.stopPropagation();
+      setOrderStatus({
+        type: "danger",
+        message: "Please fill in all required fields correctly",
+      });
       return;
     }
 
-    // Simulate order processing
-    setValidated(true);
-    processOrder();
+    // Additional email validation
+    if (!formData.email || !formData.email.includes("@")) {
+      setOrderStatus({
+        type: "danger",
+        message: "Please enter a valid email address",
+      });
+      return;
+    }
+
+    // Prepare order data
+    const orderDetails = {
+      items: cartItems,
+      total: getTotalPrice(),
+      customerInfo: {
+        ...formData,
+        name: `${formData.firstName} ${formData.lastName}`.trim(),
+      },
+    };
+
+    // Log the email being used (for debugging)
+    console.log("Submitting order with email:", formData.email);
+
+    try {
+      // Process the order first
+      processOrder();
+
+      // Try to send email confirmation with clean email address
+      try {
+        const cleanEmail = formData.email.trim().toLowerCase();
+        console.log("Attempting to send email to:", cleanEmail);
+
+        // Call email service with proper parameters
+        const result = await sendOrderConfirmation(orderDetails, cleanEmail);
+
+        if (result.success) {
+          setOrderStatus({
+            type: "success",
+            message:
+              "Order placed successfully! Check your email for confirmation.",
+          });
+        }
+      } catch (emailError) {
+        console.error("Email sending failed:", emailError);
+        // Still show a success message for the order but warn about email
+        setOrderStatus({
+          type: "warning",
+          message: `Order placed successfully! (Email confirmation failed: ${emailError.message})`,
+        });
+      }
+
+      // Clear form data
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        address: "",
+        city: "",
+        zipCode: "",
+        paymentNumber: "",
+        accountName: "",
+        name: "",
+        deliveryMethod: "pickup",
+      });
+    } catch (error) {
+      console.error("Order processing error:", error);
+      setOrderStatus({
+        type: "danger",
+        message:
+          "An error occurred while processing your order. Please try again.",
+      });
+    }
   };
 
   const processOrder = () => {
     // Generate random order number
     const randomOrderNumber =
-      'ORD-' + Math.floor(100000 + Math.random() * 900000);
+      "ORD-" + Math.floor(100000 + Math.random() * 900000);
     setOrderNumber(randomOrderNumber);
     setOrderPlaced(true);
 
@@ -68,7 +146,7 @@ const Order = () => {
     clearCart();
 
     // In a real app, here you would send the order to a backend
-    console.log('Order processed:', {
+    console.log("Order processed:", {
       orderNumber: randomOrderNumber,
       items: cartItems,
       customerInfo: formData,
@@ -78,7 +156,7 @@ const Order = () => {
   };
 
   const handleContinueShopping = () => {
-    navigate('/menu');
+    navigate("/menu");
   };
 
   // If cart is empty and no order placed, redirect to menu
@@ -138,6 +216,10 @@ const Order = () => {
   return (
     <Container className="py-5 checkout-page">
       <h1 className="text-center mb-4">Checkout</h1>
+
+      {orderStatus && (
+        <Alert variant={orderStatus.type}>{orderStatus.message}</Alert>
+      )}
 
       <Row>
         <Col lg={8}>
@@ -212,18 +294,29 @@ const Order = () => {
                 </Row>
 
                 <Form.Group className="mb-3">
-                  <Form.Label>Address</Form.Label>
-                  <Form.Control
-                    required
-                    type="text"
-                    name="address"
-                    value={formData.address}
+                  <Form.Label>Delivery Method</Form.Label>
+                  <Form.Select
+                    name="deliveryMethod"
+                    value={formData.deliveryMethod}
                     onChange={handleChange}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    Please provide your address.
-                  </Form.Control.Feedback>
+                  >
+                    <option value="pickup">Pickup</option>
+                    <option value="delivery">Delivery</option>
+                  </Form.Select>
                 </Form.Group>
+
+                {formData.deliveryMethod === "delivery" && (
+                  <Form.Group className="mb-3">
+                    <Form.Label>Delivery Address</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Form.Group>
+                )}
 
                 <Row>
                   <Col md={6}>
@@ -266,8 +359,8 @@ const Order = () => {
                     label="GCash"
                     name="paymentMethod"
                     value="gcash"
-                    checked={paymentMethod === 'gcash'}
-                    onChange={() => setPaymentMethod('gcash')}
+                    checked={paymentMethod === "gcash"}
+                    onChange={() => setPaymentMethod("gcash")}
                     id="gcash-payment"
                   />
                   <Form.Check
@@ -275,13 +368,13 @@ const Order = () => {
                     label="Maya"
                     name="paymentMethod"
                     value="maya"
-                    checked={paymentMethod === 'maya'}
-                    onChange={() => setPaymentMethod('maya')}
+                    checked={paymentMethod === "maya"}
+                    onChange={() => setPaymentMethod("maya")}
                     id="maya-payment"
                   />
                 </Form.Group>
 
-                {paymentMethod === 'gcash' && (
+                {paymentMethod === "gcash" && (
                   <div className="payment-details gcash-details">
                     <Row>
                       <Col md={12}>
@@ -322,7 +415,7 @@ const Order = () => {
                   </div>
                 )}
 
-                {paymentMethod === 'maya' && (
+                {paymentMethod === "maya" && (
                   <div className="payment-details maya-details">
                     <Row>
                       <Col md={12}>

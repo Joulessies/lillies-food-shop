@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext } from "react";
 
 // Create cart context
 const CartContext = createContext();
@@ -25,7 +25,7 @@ export const CartProvider = ({ children }) => {
       updatedCartItems[existingItemIndex].quantity += quantity;
       setCartItems(updatedCartItems);
     } else {
-      // Item doesn't exist, add new
+      // If Item doesn't exist, add new
       setCartItems([...cartItems, { ...item, quantity }]);
     }
   };

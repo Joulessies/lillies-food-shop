@@ -23,17 +23,31 @@ const Menu = () => {
   const { addToCart } = useCart();
 
   useEffect(() => {
-    // Initialize audio when component mounts
-    audioRef.current = new Audio("/success-sound.mp3");
-    audioRef.current.load(); // Preload the audio
+    try {
+      // Initialize audio when component mounts
+      audioRef.current = new Audio("/success-sound.mp3");
+      // Set volume to a reasonable level
+      audioRef.current.volume = 0.5;
 
-    // Cleanup on unmount
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
+      // Handle audio loading
+      const handleLoadError = () => {
+        console.warn("Audio failed to load");
+      };
+
+      audioRef.current.addEventListener("error", handleLoadError);
+      audioRef.current.load();
+
+      // Cleanup on unmount
+      return () => {
+        if (audioRef.current) {
+          audioRef.current.removeEventListener("error", handleLoadError);
+          audioRef.current.pause();
+          audioRef.current = null;
+        }
+      };
+    } catch (error) {
+      console.warn("Audio initialization failed:", error);
+    }
   }, []);
 
   const handleShow = (item) => {
@@ -54,12 +68,15 @@ const Menu = () => {
     try {
       if (audioRef.current) {
         audioRef.current.currentTime = 0; // Reset audio to start
-        audioRef.current.play().catch((error) => {
-          console.error("Error playing sound:", error);
-        });
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.warn("Audio playback failed:", error);
+          });
+        }
       }
     } catch (error) {
-      console.error("Error with audio:", error);
+      console.warn("Error with audio:", error);
     }
     setShowAlert(true);
     setTimeout(() => setShowAlert(false), 3000);
@@ -78,7 +95,7 @@ const Menu = () => {
           description:
             "Beef patty, lettuce, tomato, onion, and special sauce on a potato bun",
           price: 120,
-          image: "https://via.placeholder.com/300x200",
+          image: "/src/assets/images/Burgers/classic-burger.jpg",
         },
         {
           id: 102,
@@ -86,7 +103,7 @@ const Menu = () => {
           description:
             "Beef patty, cheddar cheese, lettuce, tomato, onion, and special sauce",
           price: 130,
-          image: "https://via.placeholder.com/300x200",
+          image: "/src/assets/images/Burgers/cheese-burger.jpg",
         },
         {
           id: 140,
@@ -94,7 +111,7 @@ const Menu = () => {
           description:
             "Beef patty, bacon, lettuce, tomato, onion, and special sauce",
           price: 100,
-          image: "https://via.placeholder.com/300x200",
+          image: "/src/assets/images/Burgers/bacon-burger.jpg",
         },
       ],
     },
@@ -108,21 +125,21 @@ const Menu = () => {
           description:
             "Crispy golden french fries with our signature seasoning",
           price: 100,
-          image: "https://via.placeholder.com/300x200",
+          image: "/src/assets/images/Fries/french-fries.jpg",
         },
         {
           id: 202,
           name: "Onion Rings",
           description: "Crispy battered onion rings served with dipping sauce",
           price: 140,
-          image: "https://via.placeholder.com/300x200",
+          image: "/src/assets/images/Fries/onion-rings.jpg",
         },
         {
           id: 203,
           name: "Coleslaw",
           description: "Fresh cabbage, carrots, and our special dressing",
           price: 110,
-          image: "https://via.placeholder.com/300x200",
+          image: "/src/assets/images/Fries/coleslaw.jpg",
         },
       ],
     },
@@ -135,21 +152,21 @@ const Menu = () => {
           name: "Soft Drinks",
           description: "Choose from a variety of refreshing beverages",
           price: 70,
-          image: "https://via.placeholder.com/300x200",
+          image: "/src/assets/images/Beverages/soft-drinks.jpg",
         },
         {
           id: 302,
           name: "Milkshakes",
           description: "Creamy handcrafted milkshakes in various flavors",
           price: 70,
-          image: "https://via.placeholder.com/300x200",
+          image: "/src/assets/images/Beverages/milkshakes.jpg",
         },
         {
           id: 303,
           name: "Iced Tea",
           description: "Freshly brewed iced tea, sweetened or unsweetened",
           price: 65,
-          image: "https://via.placeholder.com/300x200",
+          image: "/src/assets/images/Beverages/iced-tea.jpg",
         },
       ],
     },
