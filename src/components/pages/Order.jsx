@@ -80,19 +80,14 @@ const Order = () => {
       },
     };
 
-    // Log the email being used (for debugging)
     console.log("Submitting order with email:", formData.email);
 
     try {
-      // Process the order first
       processOrder();
-
-      // Try to send email confirmation with clean email address
       try {
         const cleanEmail = formData.email.trim().toLowerCase();
         console.log("Attempting to send email to:", cleanEmail);
 
-        // Call email service with proper parameters
         const result = await sendOrderConfirmation(orderDetails, cleanEmail);
 
         if (result.success) {
@@ -104,7 +99,6 @@ const Order = () => {
         }
       } catch (emailError) {
         console.error("Email sending failed:", emailError);
-        // Still show a success message for the order but warn about email
         setOrderStatus({
           type: "warning",
           message: `Order placed successfully! (Email confirmation failed: ${emailError.message})`,
@@ -136,7 +130,6 @@ const Order = () => {
   };
 
   const processOrder = () => {
-    // Generate random order number
     const randomOrderNumber =
       "ORD-" + Math.floor(100000 + Math.random() * 900000);
     setOrderNumber(randomOrderNumber);
@@ -145,7 +138,6 @@ const Order = () => {
     // Clear cart after successful order
     clearCart();
 
-    // In a real app, here you would send the order to a backend
     console.log("Order processed:", {
       orderNumber: randomOrderNumber,
       items: cartItems,
@@ -159,7 +151,6 @@ const Order = () => {
     navigate("/menu");
   };
 
-  // If cart is empty and no order placed, redirect to menu
   if (cartItems.length === 0 && !orderPlaced) {
     return (
       <Container className="py-5 text-center">
@@ -478,13 +469,13 @@ const Order = () => {
                   <span>
                     {item.quantity} × {item.name}
                   </span>
-                  <span>${(item.price * item.quantity).toFixed(2)}</span>
+                  <span>₱{(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
               <hr />
               <div className="d-flex justify-content-between total-section">
                 <h4>Total</h4>
-                <h4>${getTotalPrice()}</h4>
+                <h4>₱{getTotalPrice()}</h4>
               </div>
             </Card.Body>
           </Card>

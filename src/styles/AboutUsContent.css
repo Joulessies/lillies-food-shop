@@ -1,4 +1,123 @@
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap");
+
 .about-us-content {
-  text-align: center;
-  height: 900px;
+  padding: 50px 0;
+  background-color: #faf7f2;
+  font-family: "Oswald", sans-serif;
+  height: 1200px;
+}
+
+.about-us-content h1 {
+  padding: 15px;
+}
+
+.who-are-we-section {
+  margin: 50px 0;
+}
+
+.section-title {
+  font-size: 6.5rem;
+  font-weight: 700;
+  color: #0075ff;
+  margin-bottom: 30px;
+}
+
+.image-placeholder {
+  background-color: #ddd;
+  height: 300px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 22px;
+  margin-bottom: 30px;
+}
+
+.about-us-content p {
+  font-size: 1.3rem;
+  line-height: 1.7;
+  margin-bottom: 25px;
+}
+
+.quote-text {
+  font-size: 1.4rem;
+  margin-top: 60px;
+  padding: 22px;
+  background-color: #f5f5f5;
+  border-left: 5px solid #0075ff;
+}
+
+/* Our Mission Section */
+.our-mission-section {
+  background-color: #0075ff;
+  color: white;
+  padding: 70px 0;
+  font-family: "Oswald", sans-serif;
+}
+
+.mission-title {
+  font-size: 6.5rem;
+  font-weight: bold;
+  color: #ffff00;
+  line-height: 1;
+  margin-bottom: 35px;
+}
+
+.mission-text {
+  font-size: 1.6rem;
+  line-height: 1.7;
+  padding-top: 15px;
+}
+
+.large-image-placeholder {
+  background-color: #ddd;
+  height: 500px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  font-size: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 35px;
+}
+
+.feature-boxes {
+  margin-top: 35px;
+}
+
+.feature-box {
+  background-color: #ddd;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 20px;
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 4.5rem;
+  }
+
+  .quote-text {
+    margin-top: 35px;
+    font-size: 1.2rem;
+  }
+
+  .mission-title {
+    font-size: 4.5rem;
+  }
+
+  .mission-text {
+    font-size: 1.3rem;
+  }
+
+  .feature-box {
+    margin-bottom: 20px;
+    height: 180px;
+  }
 }
