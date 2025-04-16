@@ -26,7 +26,6 @@ const Menu = () => {
     try {
       // Initialize audio when component mounts
       audioRef.current = new Audio("/success-sound.mp3");
-      // Set volume to a reasonable level
       audioRef.current.volume = 0.5;
 
       // Handle audio loading
@@ -37,7 +36,6 @@ const Menu = () => {
       audioRef.current.addEventListener("error", handleLoadError);
       audioRef.current.load();
 
-      // Cleanup on unmount
       return () => {
         if (audioRef.current) {
           audioRef.current.removeEventListener("error", handleLoadError);

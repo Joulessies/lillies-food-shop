@@ -12,34 +12,28 @@ const EmailTest = () => {
     setStatus("Sending...");
 
     try {
-      // Initialize EmailJS
       emailjs.init("I-nhzq2Yd43TciJUH");
 
-      // Validate email
       if (!email || !email.includes("@")) {
         throw new Error("Please enter a valid email address");
       }
 
       console.log("Sending test email to:", email);
 
-      // Create a real form object that matches EmailJS expected format
       const formElement = document.createElement("form");
 
-      // Add recipient field
       const recipientField = document.createElement("input");
       recipientField.name = "to_email";
       recipientField.value = email;
       formElement.appendChild(recipientField);
 
-      // Add template fields based on your EmailJS template
       const templateFields = {
         from_name: "Lillies Food Shop",
         to_name: "Test User",
         reply_to: email,
 
-        // Template fields from your screenshot
         order_id: `TEST-${Date.now()}`,
-        orders: "Test Pizza x 1 - $15.99\nTest Burger x 2 - $25.98",
+        orders: "Test Pizza x 1 - $1e.99\nTest Burger x 2 - $25.98",
         image_url: "",
         name: "Test Customer",
         units: "3",
@@ -48,7 +42,6 @@ const EmailTest = () => {
         email: email,
       };
 
-      // Add all template fields to the form
       Object.entries(templateFields).forEach(([key, value]) => {
         const input = document.createElement("input");
         input.name = key;
@@ -59,16 +52,15 @@ const EmailTest = () => {
       console.log(
         "Sending with form fields:",
         Object.fromEntries(
-          Array.from(formElement.elements).map((el) => [el.name, el.value])
-        )
+          Array.from(formElement.elements).map((el) => [el.name, el.value]),
+        ),
       );
 
-      // Use sendForm method instead
       const response = await emailjs.sendForm(
         "service_nqry9ul",
         "template_z9dl22q",
         formElement,
-        "I-nhzq2Yd43TciJUH"
+        "I-nhzq2Yd43TciJUH",
       );
 
       console.log("Test email sent:", response);
