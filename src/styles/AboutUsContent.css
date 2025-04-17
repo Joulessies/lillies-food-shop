@@ -1,10 +1,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap");
 
+body {
+  background-color: #faf3e0;
+}
+
 .about-us-content {
   padding: 50px 0;
-  background-color: #faf7f2;
   font-family: "Oswald", sans-serif;
   height: 1200px;
+  background-color: #faf3e0;
 }
 
 .about-us-content h1 {
@@ -96,6 +100,112 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
   font-size: 20px;
   color: #333;
+}
+
+.best-selling-orders {
+  height: 800px;
+}
+
+.best-selling-orders h1 {
+  text-align: center;
+  padding-top: 50px;
+  font-weight: 700;
+  font-size: 80px;
+  color: #0075ff;
+}
+
+/* styles/FAQSection.css */
+
+.faq-section {
+  background-color: #0275d8;
+  color: #fff;
+  padding: 60px 0;
+}
+
+.faq-section h2 {
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+.faq-accordion .accordion-item {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  border: none;
+}
+
+.faq-accordion .accordion-button {
+  font-weight: 600;
+  background-color: #fff;
+  color: #333;
+  padding: 20px;
+}
+
+.faq-accordion .accordion-button:not(.collapsed) {
+  background-color: #f8f9fa;
+  color: #0275d8;
+  box-shadow: none;
+}
+
+.faq-accordion .accordion-body {
+  padding: 20px;
+  background-color: #fff;
+  color: #333;
+  line-height: 1.6;
+}
+
+.faq-accordion .accordion-button:focus {
+  box-shadow: none;
+  border-color: rgba(2, 117, 216, 0.25);
+}
+
+.faq-accordion .accordion-button::after {
+  background-size: 16px;
+}
+
+.frequently-asked-questions {
+  background-color: #0075ff;
+}
+
+.order-now-section {
+  padding: 0;
+  margin: 0;
+}
+
+.marquee-order-now {
+  background-color: #ff4500;
+  padding: 1.5rem 0;
+  overflow: hidden;
+  color: white;
+}
+
+.order-now-text {
+  font-size: 4.5rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  white-space: nowrap;
+  color: white;
+  display: inline-block;
+}
+
+.order-now-btn {
+  background-color: white;
+  color: #000;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  display: inline-block;
+  white-space: nowrap;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.order-now-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 @media (max-width: 768px) {
