@@ -193,7 +193,7 @@ export default function NavigationBar() {
                           </Button>
                         </div>
                       </td>
-                      <td>${(item.price * item.quantity).toFixed(2)}</td>
+                      <td>₱{(item.price * item.quantity).toFixed(2)}</td>
                       <td>
                         <Button
                           variant="link"
@@ -211,7 +211,7 @@ export default function NavigationBar() {
                     <th colSpan="3" className="text-end">
                       Total:
                     </th>
-                    <th>${getTotalPrice()}</th>
+                    <th>₱{getTotalPrice()}</th>
                     <th></th>
                   </tr>
                 </tfoot>

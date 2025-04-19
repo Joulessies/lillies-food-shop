@@ -12,6 +12,21 @@ import {
 import "../../styles/Menu.css";
 import { useCart } from "../../context/CartContext";
 
+// Burgers
+import Classic from "../../assets/images/Burgers/classic.avif";
+import Fancy from "../../assets/images/Burgers/fancy.avif";
+import Elegant from "../../assets/images/Burgers/elegant.avif";
+
+// Fries
+import GoldenFries from "../../assets/images/Fries/goldenfries.webp";
+import HalfAndHalf from "../../assets/images/Fries/half-and-half.webp";
+import SweetFries from "../../assets/images/Fries/sweetfries.webp";
+
+// Beverages
+import Lemonade from "../../assets/images/Beverages/lemonade.avif";
+import IceTea from "../../assets/images/Beverages/ice-tea.avif";
+import HalfAndHalfLemonAndTea from "../../assets/images/Beverages/half-tea-half-lemon.avif";
+
 const Menu = () => {
   // State for modal
   const [show, setShow] = useState(false);
@@ -89,27 +104,27 @@ const Menu = () => {
       items: [
         {
           id: 101,
-          name: "Classic Burger",
+          name: "Classic",
           description:
             "Beef patty, lettuce, tomato, onion, and special sauce on a potato bun",
           price: 120,
-          image: "/src/assets/images/Burgers/classic-burger.jpg",
+          image: Classic,
         },
         {
           id: 102,
-          name: "Cheese Burger",
+          name: "Fancy",
           description:
             "Beef patty, cheddar cheese, lettuce, tomato, onion, and special sauce",
           price: 130,
-          image: "/src/assets/images/Burgers/cheese-burger.jpg",
+          image: Fancy,
         },
         {
           id: 140,
-          name: "Bacon Burger",
+          name: "Elegant",
           description:
             "Beef patty, bacon, lettuce, tomato, onion, and special sauce",
           price: 100,
-          image: "/src/assets/images/Burgers/bacon-burger.jpg",
+          image: Elegant,
         },
       ],
     },
@@ -119,25 +134,27 @@ const Menu = () => {
       items: [
         {
           id: 201,
-          name: "French Fries",
+          name: "Golden Fries",
           description:
             "Crispy golden french fries with our signature seasoning",
           price: 100,
-          image: "/src/assets/images/Fries/french-fries.jpg",
+          image: GoldenFries,
         },
         {
           id: 202,
-          name: "Onion Rings",
-          description: "Crispy battered onion rings served with dipping sauce",
+          name: "Sweet Fries",
+          description:
+            "Sweet potato fries are a delicious alternative to traditional french fries, made from sweet potatoes instead of regular potatoes. ",
           price: 140,
-          image: "/src/assets/images/Fries/onion-rings.jpg",
+          image: SweetFries,
         },
         {
           id: 203,
-          name: "Coleslaw",
-          description: "Fresh cabbage, carrots, and our special dressing",
+          name: "Half and Half",
+          description:
+            "Enjoy the best of both worlds with our Half and Half platter - crispy golden potato fries paired with sweet potato fries side by side.",
           price: 110,
-          image: "/src/assets/images/Fries/coleslaw.jpg",
+          image: HalfAndHalf,
         },
       ],
     },
@@ -148,23 +165,23 @@ const Menu = () => {
         {
           id: 301,
           name: "Soft Drinks",
-          description: "Choose from a variety of refreshing beverages",
+          description: "Freshly homemade lemonade",
           price: 70,
-          image: "/src/assets/images/Beverages/soft-drinks.jpg",
+          image: Lemonade,
         },
         {
           id: 302,
           name: "Milkshakes",
-          description: "Creamy handcrafted milkshakes in various flavors",
+          description: "Freshly brewed ice tea, sweetend or unsweetened",
           price: 70,
-          image: "/src/assets/images/Beverages/milkshakes.jpg",
+          image: IceTea,
         },
         {
           id: 303,
           name: "Iced Tea",
-          description: "Freshly brewed iced tea, sweetened or unsweetened",
+          description: "Freshly brewed ice tea and lemonade combined together",
           price: 65,
-          image: "/src/assets/images/Beverages/iced-tea.jpg",
+          image: HalfAndHalfLemonAndTea,
         },
       ],
     },
