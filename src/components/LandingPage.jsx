@@ -5,12 +5,12 @@ import Marquee from "react-fast-marquee";
 import BurgerFries from "../assets/images/burgerfries.jpg";
 
 const MARQUEE_TEXT = [
-  { text: "TASTY LOCAL, FRESH,", className: "" },
-  { text: "NEIGHBORHOOD BURGER JOINT", className: "outline" },
-  { text: "TASTY LOCAL, FRESH,", className: "" },
-  { text: "NEIGHBORHOOD BURGER JOINT", className: "outline" },
-  { text: "TASTY LOCAL, FRESH,", className: "" },
-  { text: "NEIGHBORHOOD BURGER JOINT", className: "outline" },
+  { text: "TASTY LOCAL FRESH", className: "" },
+  { text: "NEIGHBORHOOD FOOD JOINT", className: "outline" },
+  { text: "TASTY LOCAL FRESH", className: "" },
+  { text: "NEIGHBORHOOD FOOD JOINT", className: "outline" },
+  { text: "TASTY LOCAL FRESH", className: "" },
+  { text: "NEIGHBORHOOD FOOD JOINT", className: "outline" },
 ];
 
 const VERTICAL_TEXT = [

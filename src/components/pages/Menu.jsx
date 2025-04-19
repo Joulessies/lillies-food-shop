@@ -28,7 +28,6 @@ import IceTea from "../../assets/images/Beverages/ice-tea.avif";
 import HalfAndHalfLemonAndTea from "../../assets/images/Beverages/half-tea-half-lemon.avif";
 
 const Menu = () => {
-  // State for modal
   const [show, setShow] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -39,7 +38,6 @@ const Menu = () => {
 
   useEffect(() => {
     try {
-      // Initialize audio when component mounts
       audioRef.current = new Audio("/success-sound.mp3");
       audioRef.current.volume = 0.5;
 
@@ -80,7 +78,7 @@ const Menu = () => {
     addToCart(selectedItem, quantity);
     try {
       if (audioRef.current) {
-        audioRef.current.currentTime = 0; // Reset audio to start
+        audioRef.current.currentTime = 0;
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
           playPromise.catch((error) => {
@@ -274,7 +272,7 @@ const Menu = () => {
 
                     <div className="mt-4">
                       <h4 className="total-price">
-                        Total: ${(selectedItem.price * quantity).toFixed(2)}
+                        Total: ₱{(selectedItem.price * quantity).toFixed(2)}
                       </h4>
                     </div>
                   </Form>
