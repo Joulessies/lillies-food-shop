@@ -9,10 +9,13 @@ import Menu from "./components/pages/Menu";
 import RateUs from "./components/pages/RateUs";
 import Order from "./components/pages/Order";
 import Footer from "./components/layout/Footer/Footer";
+import Login from "./components/pages/LoginPage";
+import Signup from "./components/pages/SignupPage";
 import { CartProvider } from "./context/CartContext";
 import { useEffect } from "react";
 import lenis from "./utils/lenis";
 import EmailTest from "./EmailTest";
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   useEffect(() => {
@@ -21,6 +24,7 @@ function App() {
 
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <AuthProvider>
       <CartProvider>
         <div className="app-container">
           <div className="navbar-container">
@@ -39,16 +43,20 @@ function App() {
                   </div>
                 </main>
               }
-            />
+              />
+            <Route path="/home" element={<LandingPage />} />
             <Route path="/about" element={<About />} />
             <Route path="/menu" element={<Menu />} />
             <Route path="/rateus" element={<RateUs />} />
             <Route path="/order" element={<Order />} />
             <Route path="/email-test" element={<EmailTest />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
           </Routes>
           <Footer />
-        </div>
-      </CartProvider>
+          </div>
+        </CartProvider>
+      </AuthProvider>
     </Router>
   );
 }

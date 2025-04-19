@@ -14,11 +14,13 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../../styles/Navbar.css";
 import Logo from "../../../assets/images/logo.svg";
 import { useCart } from "../../../context/CartContext";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function NavigationBar() {
   const [showCart, setShowCart] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
 
   const {
     cartItems,
@@ -50,6 +52,11 @@ export default function NavigationBar() {
   const handleShowCart = (e) => {
     e.preventDefault();
     setShowCart(true);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   const itemCount = getItemCount();
@@ -133,6 +140,21 @@ export default function NavigationBar() {
                   </span>
                 )}
               </Button>
+              
+              {isAuthenticated ? (
+                <NavDropdown title={user?.name || 'Account'} id="user-dropdown" className="me-3">
+                  <NavDropdown.Item as={Link} to="/profile">My Profile</NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/orders">My Orders</NavDropdown.Item>
+                  <NavDropdown.Divider />
+                  <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
+                </NavDropdown>
+              ) : (
+                <>
+                  <Nav.Link as={Link} to="/login" className="me-2">Login</Nav.Link>
+                  <Nav.Link as={Link} to="/signup" className="me-3">Sign Up</Nav.Link>
+                </>
+              )}
+              
               <Nav.Link
                 as={Link}
                 to="/order"
