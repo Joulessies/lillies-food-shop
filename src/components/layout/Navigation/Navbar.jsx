@@ -7,6 +7,8 @@ import {
   Modal,
   Table,
   NavDropdown,
+  OverlayTrigger,
+  Tooltip,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -128,21 +130,45 @@ export default function NavigationBar() {
               </Nav.Link>
             </Nav>
             <Nav>
-              <Button
-                variant="link"
-                className="cart-link me-3 border border-2 rounded p-2 position-relative"
-                onClick={handleShowCart}
+              {/* Shopping Cart Icon */}
+              <OverlayTrigger
+                placement="bottom"
+                overlay={<Tooltip>Shopping Cart</Tooltip>}
               >
-                <i className="bi bi-cart3 fs-5"></i>
-                {itemCount > 0 && (
-                  <span className="cart-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    {itemCount}
-                  </span>
-                )}
-              </Button>
+                <Button
+                  variant="link"
+                  className="cart-link me-3 border border-2 rounded p-2 position-relative"
+                  onClick={handleShowCart}
+                >
+                  <i className="bi bi-cart3 fs-5"></i>
+                  {itemCount > 0 && (
+                    <span className="cart-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                      {itemCount}
+                    </span>
+                  )}
+                </Button>
+              </OverlayTrigger>
               
+              {/* Order Now Button - Moved before authentication section */}
+              <Nav.Link
+                as={Link}
+                to="/order"
+                className="order-now-link rounded me-3"
+              >
+                Order Now
+              </Nav.Link>
+              
+              {/* Authentication Section */}
               {isAuthenticated ? (
-                <NavDropdown title={user?.name || 'Account'} id="user-dropdown" className="me-3">
+                <NavDropdown 
+                  title={
+                    <div className="d-inline-block">
+                      <i className="bi bi-person-circle fs-5"></i>
+                      <span className="ms-1 d-none d-md-inline">{user?.name || 'Account'}</span>
+                    </div>
+                  } 
+                  id="user-dropdown" 
+                >
                   <NavDropdown.Item as={Link} to="/profile">My Profile</NavDropdown.Item>
                   <NavDropdown.Item as={Link} to="/orders">My Orders</NavDropdown.Item>
                   <NavDropdown.Divider />
@@ -150,18 +176,27 @@ export default function NavigationBar() {
                 </NavDropdown>
               ) : (
                 <>
-                  <Nav.Link as={Link} to="/login" className="me-2">Login</Nav.Link>
-                  <Nav.Link as={Link} to="/signup" className="me-3">Sign Up</Nav.Link>
+                  {/* Login Icon */}
+                  <OverlayTrigger
+                    placement="bottom"
+                    overlay={<Tooltip>Login</Tooltip>}
+                  >
+                    <Nav.Link as={Link} to="/login" className="me-2 p-2 border border-2 rounded">
+                      <i className="bi bi-box-arrow-in-right fs-5"></i>
+                    </Nav.Link>
+                  </OverlayTrigger>
+                  
+                  {/* Signup Icon */}
+                  <OverlayTrigger
+                    placement="bottom"
+                    overlay={<Tooltip>Sign Up</Tooltip>}
+                  >
+                    <Nav.Link as={Link} to="/signup" className="p-2 border border-2 rounded">
+                      <i className="bi bi-person-plus fs-5"></i>
+                    </Nav.Link>
+                  </OverlayTrigger>
                 </>
               )}
-              
-              <Nav.Link
-                as={Link}
-                to="/order"
-                className="order-now-link rounded"
-              >
-                Order Now
-              </Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
