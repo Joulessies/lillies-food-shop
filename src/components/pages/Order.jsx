@@ -206,7 +206,7 @@ const Order = () => {
   // Checkout form view
   return (
     <Container className="py-5 checkout-page">
-      <h1 className="text-center mb-4">Checkout</h1>
+      <h1 className="text-center mb-4 text-info">Checkout</h1>
 
       {orderStatus && (
         <Alert variant={orderStatus.type}>{orderStatus.message}</Alert>

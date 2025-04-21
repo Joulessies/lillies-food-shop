@@ -1,3 +1,7 @@
+.text-color {
+  color: #0d6efd;
+}
+
 .checkout-page {
   margin-top: 2rem;
   margin-bottom: 4rem;
@@ -81,28 +85,28 @@
 }
 
 #gcash-payment + .form-check-label::before {
-  content: '';
+  content: "";
   display: inline-block;
   width: 24px;
   height: 24px;
   position: absolute;
   left: 0;
   top: 0;
-  background-image: url('https://www.gcash.com/wp-content/uploads/2019/05/GCash-Logo-PNG-1024x1024.png');
+  background-image: url("https://www.gcash.com/wp-content/uploads/2019/05/GCash-Logo-PNG-1024x1024.png");
   background-size: contain;
   background-repeat: no-repeat;
   margin-right: 10px;
 }
 
 #maya-payment + .form-check-label::before {
-  content: '';
+  content: "";
   display: inline-block;
   width: 24px;
   height: 24px;
   position: absolute;
   left: 0;
   top: 0;
-  background-image: url('https://mms.businesswire.com/media/20220428005502/en/1440472/5/Maya_Logo_Colored.jpg');
+  background-image: url("https://mms.businesswire.com/media/20220428005502/en/1440472/5/Maya_Logo_Colored.jpg");
   background-size: contain;
   background-repeat: no-repeat;
   margin-right: 10px;
