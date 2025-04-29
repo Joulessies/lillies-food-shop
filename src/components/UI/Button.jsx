@@ -1,11 +1,5 @@
 import { Button } from 'react-bootstrap';
 
-export const SearchButton = ({ openSearch }) => (
-  <Button variant="outline-success" onClick={openSearch}>
-    🔍 Search
-  </Button>
-);
-
 export const CustomButton = ({ label, onClick, variant = 'primary' }) => (
   <Button variant={variant} onClick={onClick}>
     {label}
@@ -17,3 +11,9 @@ export const OrderButton = ({ label, onClick, variant = 'primary' }) => (
     {label}
   </Button>
 );
+
+export const AddToCartButton = ({ label, onClick, variant = 'primary' }) => (
+  <Button variant={variant} onClick={onClick} className="add-to-cart-button">
+    {label}
+  </Button>
+)

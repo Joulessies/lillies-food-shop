@@ -130,6 +130,7 @@ export default function NavigationBar() {
               </Nav.Link>
             </Nav>
             <Nav>
+
               {/* Shopping Cart Icon */}
               <OverlayTrigger
                 placement="bottom"

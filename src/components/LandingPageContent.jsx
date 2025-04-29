@@ -2,6 +2,12 @@ import "../styles/LandingPageContent.css";
 import { Image, Row, Col, Container, Button } from "react-bootstrap";
 import FeaturedSwiper from "../components/Swiper";
 import Marquee from "react-fast-marquee";
+import PeopleEating1 from "../../src/assets/images/Featured/people-eating.jpg";
+import PeopleEating2 from "../../src/assets/images/Featured/people-eating2.jpg";
+import PeopleEating3 from "../../src/assets/images/Featured/people-eating3.jpg";
+import PeopleEating4 from "../../src/assets/images/Featured/people-eating4.jpg";
+import BurgerFriesDiscount from "../assets/images/Discounts/burger-fries-discount.jpg";
+
 
 // Customer reviews data
 const reviewsData = [
@@ -94,27 +100,27 @@ export default function LandingPageContent() {
       </div>
 
       {/* Featured Section */}
-      <div className="featured-section">
+      <div className="featured-section" src={PeopleEating3}>
         <h1>Featured</h1>
         <div className="featured-section-grid">
           <Container>
             <Row>
               <Col>
-                <Image className="featured-landing-page" />
+                <Image className="featured-landing-page" src={PeopleEating2} />
                 <div className="featured-text">
                   <h3>Dining Experience</h3>
                   <p>Enjoy our delicious meals in a cozy atmosphere</p>
                 </div>
               </Col>
               <Col>
-                <Image className="featured-landing-page" />
+                <Image className="featured-landing-page" src={PeopleEating4} />
                 <div className="featured-text">
                   <h3>Share with Friends</h3>
                   <p>Enjoy our delicious meals in a cozy atmosphere</p>
                 </div>
               </Col>
               <Col>
-                <Image className="featured-landing-page" />
+                <Image className="featured-landing-page" src={PeopleEating4} />
                 <div className="featured-text">
                   <h3>Share with loved ones</h3>
                   <p>Enjoy your delicious meals with your loved ones</p>
@@ -123,14 +129,14 @@ export default function LandingPageContent() {
             </Row>
             <Row>
               <Col>
-                <Image className="featured-landing-page" />
+                <Image className="featured-landing-page" src={PeopleEating1} />
                 <div className="featured-text">
                   <h3>Burger Discount</h3>
                   <p>Delicious burger at a discount</p>
                 </div>
               </Col>
               <Col>
-                <Image className="featured-landing-page" />
+                <Image className="featured-landing-page" src={BurgerFriesDiscount} />
                 <div className="featured-text">
                   <h3>French Fries Discount</h3>
                   <p>Crispy fries at a special price</p>
