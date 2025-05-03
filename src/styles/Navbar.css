@@ -1,6 +1,6 @@
 .navbar-custom {
-  background-color: transparent;
-  box-shadow: none;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 1rem;
   position: fixed;
   width: 100%;
@@ -9,7 +9,7 @@
 }
 
 .navbar-scrolled {
-  box-shadow: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   padding: 0.7rem 1rem;
 }
 
@@ -72,11 +72,10 @@
   transform: translate(-50%, -50%) !important;
 }
 
-/* Dropdown styling */
 .dropdown-menu {
   border-radius: 8px;
   border: none;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: #ffffff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   padding: 0.5rem 0;
   margin-top: 0 !important;
@@ -88,13 +87,11 @@
   z-index: 1001;
 }
 
-/* Nav item with dropdown */
 .nav-item.dropdown {
   position: relative;
   padding-bottom: 10px;
 }
 
-/* Show dropdown on hover */
 .nav-item.dropdown:hover .dropdown-menu {
   opacity: 1;
   visibility: visible;
@@ -103,7 +100,7 @@
 
 .dropdown-item {
   padding: 0.6rem 1.5rem;
-  color: white;
+  color: #333;
   font-weight: 500;
   transition: all 0.2s ease;
 }
@@ -115,10 +112,9 @@
 
 .dropdown-divider {
   margin: 0.3rem 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* Improve the dropdown toggle appearance */
 .nav-link.dropdown-toggle {
   position: relative;
   padding-right: 1.5rem !important;
@@ -132,14 +128,13 @@
   transition: transform 0.2s ease;
 }
 
-/* Add hover effect for dropdown toggle */
 .nav-item.dropdown:hover .nav-link.dropdown-toggle::after {
   transform: translateY(-50%) rotate(180deg);
 }
 
 @media (max-width: 991px) {
   .navbar-collapse {
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: #ffffff;
     margin-top: 1rem;
     padding: 1rem;
     border-radius: 8px;
@@ -154,4 +149,198 @@
     display: inline-block;
     margin-top: 0.5rem;
   }
+}
+
+.cart-modal .modal-header {
+  border-bottom: 2px solid #f8f9fa;
+  padding: 1rem 1.5rem;
+}
+
+.cart-modal .modal-footer {
+  border-top: 2px solid #f8f9fa;
+  padding: 1rem 1.5rem;
+}
+
+.empty-cart-icon {
+  font-size: 4rem;
+  color: #dee2e6;
+  margin-bottom: 1rem;
+}
+
+.cart-item {
+  padding: 1rem 0;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.cart-item-img-container {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.cart-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder-img {
+  width: 100%;
+  height: 100%;
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #adb5bd;
+  font-size: 1.5rem;
+  border-radius: 8px;
+}
+
+.cart-item-name {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.cart-item-price {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantity-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantity-display {
+  width: 40px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.remove-item-btn:hover {
+  transform: scale(1.2);
+  transition: transform 0.2s ease;
+}
+
+.cart-item-total {
+  color: #212529;
+}
+
+.cart-summary {
+  border-top: 2px solid #f8f9fa;
+  padding-top: 1rem;
+  font-size: 1.1rem;
+}
+
+.checkout-btn {
+  transition: all 0.3s ease;
+}
+
+.checkout-btn:hover {
+  transform: translateX(5px);
+}
+
+@keyframes highlight {
+  0% {
+    background-color: rgba(255, 193, 7, 0.2);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+.cart-item-new {
+  animation: highlight 2s ease;
+}
+
+.empty-cart .bi-cart-x {
+  font-size: 5rem;
+  color: #dee2e6;
+}
+
+.navbar-custom.solid-bg {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cart-modal.solid-bg .modal-content {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-backdrop {
+  opacity: 0.8;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.cart-modal .modal-header,
+.cart-modal .modal-body,
+.cart-modal .modal-footer {
+  background-color: #ffffff;
+  opacity: 1;
+}
+
+
+/* Transparent navbar at the top */
+.navbar-custom.navbar-transparent {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* Solid navbar when scrolled */
+.navbar-custom.navbar-scrolled {
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.7rem 1rem;
+}
+
+.navbar-custom.navbar-transparent .nav-link {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.navbar-custom.navbar-transparent .dropdown-menu {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.navbar-custom.navbar-transparent .dropdown-item {
+  color: #ffffff;
+}
+
+@media (max-width: 991px) {
+  .navbar-custom.navbar-transparent .navbar-collapse {
+    background-color: rgba(0, 0, 0, 0.8);
+    margin-top: 1rem;
+    border-radius: 8px;
+  }
+
+  .navbar-custom.navbar-transparent .nav-link {
+    color: #ffffff;
+  }
+}
+
+.navbar-custom.navbar-transparent .cart-badge {
+  background-color: #ff6b6b !important;
 }

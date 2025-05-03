@@ -9,6 +9,9 @@ import {
   NavDropdown,
   OverlayTrigger,
   Tooltip,
+  Image,
+  Row,
+  Col,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -32,17 +35,18 @@ export default function NavigationBar() {
     getItemCount,
   } = useCart();
 
-  // Handle scroll effect
+  // Handle scroll effect - updated to make navbar transparent at top
   useEffect(() => {
     const handleScroll = () => {
       const offset = window.scrollY;
-      if (offset > 100) {
+      if (offset > 50) {
         setScrolled(true);
       } else {
         setScrolled(false);
       }
     };
 
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
 
     return () => {
@@ -58,7 +62,7 @@ export default function NavigationBar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   const itemCount = getItemCount();
@@ -75,11 +79,20 @@ export default function NavigationBar() {
     navigate("/menu");
   };
 
+  // Image error handler
+  const handleImageError = (e) => {
+    e.target.onerror = null;
+    e.target.src = "https://via.placeholder.com/80x80?text=Food";
+  };
+
   return (
     <>
       <Navbar
         expand="lg"
-        className={`navbar-custom ${scrolled ? "navbar-scrolled" : ""}`}
+        className={`navbar-custom ${
+          scrolled ? "navbar-scrolled" : "navbar-transparent"
+        }`}
+        variant={scrolled ? "light" : "dark"}
       >
         <Container className="d-flex justify-content-between align-items-center">
           <Navbar.Toggle aria-controls="navbar-nav" className="order-1">
@@ -130,7 +143,6 @@ export default function NavigationBar() {
               </Nav.Link>
             </Nav>
             <Nav>
-
               {/* Shopping Cart Icon */}
               <OverlayTrigger
                 placement="bottom"
@@ -138,7 +150,9 @@ export default function NavigationBar() {
               >
                 <Button
                   variant="link"
-                  className="cart-link me-3 border border-2 rounded p-2 position-relative"
+                  className={`cart-link me-3 border border-2 rounded p-2 position-relative ${
+                    !scrolled ? "text-white border-white" : ""
+                  }`}
                   onClick={handleShowCart}
                 >
                   <i className="bi bi-cart3 fs-5"></i>
@@ -149,8 +163,8 @@ export default function NavigationBar() {
                   )}
                 </Button>
               </OverlayTrigger>
-              
-              {/* Order Now Button - Moved before authentication section */}
+
+              {/* Order Now Button */}
               <Nav.Link
                 as={Link}
                 to="/order"
@@ -158,22 +172,34 @@ export default function NavigationBar() {
               >
                 Order Now
               </Nav.Link>
-              
+
               {/* Authentication Section */}
               {isAuthenticated ? (
-                <NavDropdown 
+                <NavDropdown
                   title={
-                    <div className="d-inline-block">
+                    <div
+                      className={`d-inline-block ${
+                        !scrolled ? "text-white" : ""
+                      }`}
+                    >
                       <i className="bi bi-person-circle fs-5"></i>
-                      <span className="ms-1 d-none d-md-inline">{user?.name || 'Account'}</span>
+                      <span className="ms-1 d-none d-md-inline">
+                        {user?.name || "Account"}
+                      </span>
                     </div>
-                  } 
-                  id="user-dropdown" 
+                  }
+                  id="user-dropdown"
                 >
-                  <NavDropdown.Item as={Link} to="/profile">My Profile</NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/orders">My Orders</NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/profile">
+                    My Profile
+                  </NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/orders">
+                    My Orders
+                  </NavDropdown.Item>
                   <NavDropdown.Divider />
-                  <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
+                  <NavDropdown.Item onClick={handleLogout}>
+                    Logout
+                  </NavDropdown.Item>
                 </NavDropdown>
               ) : (
                 <>
@@ -182,17 +208,29 @@ export default function NavigationBar() {
                     placement="bottom"
                     overlay={<Tooltip>Login</Tooltip>}
                   >
-                    <Nav.Link as={Link} to="/login" className="me-2 p-2 border border-2 rounded">
+                    <Nav.Link
+                      as={Link}
+                      to="/login"
+                      className={`me-2 p-2 border border-2 rounded ${
+                        !scrolled ? "text-white border-white" : ""
+                      }`}
+                    >
                       <i className="bi bi-box-arrow-in-right fs-5"></i>
                     </Nav.Link>
                   </OverlayTrigger>
-                  
+
                   {/* Signup Icon */}
                   <OverlayTrigger
                     placement="bottom"
                     overlay={<Tooltip>Sign Up</Tooltip>}
                   >
-                    <Nav.Link as={Link} to="/signup" className="p-2 border border-2 rounded">
+                    <Nav.Link
+                      as={Link}
+                      to="/signup"
+                      className={`p-2 border border-2 rounded ${
+                        !scrolled ? "text-white border-white" : ""
+                      }`}
+                    >
                       <i className="bi bi-person-plus fs-5"></i>
                     </Nav.Link>
                   </OverlayTrigger>
@@ -204,93 +242,138 @@ export default function NavigationBar() {
       </Navbar>
 
       {/* Shopping Cart Modal */}
-      <Modal show={showCart} onHide={handleCloseCart} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Your Cart</Modal.Title>
+      <Modal show={showCart} onHide={handleCloseCart} backdrop="static">
+        <Modal.Header closeButton className="bg-white border-bottom-0">
+          <Modal.Title>
+            <i className="bi bi-cart3 me-2"></i>
+            Your Cart
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="p-4 bg-white">
           {cartItems.length === 0 ? (
-            <p className="text-center py-4">Your cart is empty</p>
+            <div className="empty-cart text-center py-5">
+              <i className="bi bi-cart-x empty-cart-icon"></i>
+              <h5 className="mt-3">Your cart is empty</h5>
+              <p className="text-muted mb-4">
+                Add some delicious items from our menu
+              </p>
+              <Button variant="primary" onClick={handleContinueShopping}>
+                Browse Menu
+              </Button>
+            </div>
           ) : (
-            <>
-              <Table responsive>
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cartItems.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.name}</td>
-                      <td>${item.price.toFixed(2)}</td>
-                      <td>
-                        <div className="quantity-selector">
-                          <Button
-                            variant="outline-secondary"
-                            size="sm"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity - 1)
-                            }
-                          >
-                            -
-                          </Button>
-                          <span className="mx-2">{item.quantity}</span>
-                          <Button
-                            variant="outline-secondary"
-                            size="sm"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity + 1)
-                            }
-                          >
-                            +
-                          </Button>
-                        </div>
-                      </td>
-                      <td>₱{(item.price * item.quantity).toFixed(2)}</td>
-                      <td>
+            <div className="cart-items">
+              {cartItems.map((item) => (
+                <div key={item.id} className="cart-item">
+                  <Row className="align-items-center">
+                    <Col xs={3} md={2} className="mb-2 mb-md-0">
+                      <div className="cart-item-img-container">
+                        {item.image ? (
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            className="cart-item-img"
+                            onError={handleImageError}
+                            rounded
+                          />
+                        ) : (
+                          <div className="placeholder-img">
+                            <i className="bi bi-image"></i>
+                          </div>
+                        )}
+                      </div>
+                    </Col>
+                    <Col xs={9} md={4}>
+                      <h6 className="cart-item-name mb-1">{item.name}</h6>
+                      <p className="cart-item-price">
+                        ₱{parseFloat(item.price).toFixed(2)}
+                      </p>
+                    </Col>
+                    <Col xs={6} md={3} className="my-2 my-md-0">
+                      <div className="quantity-selector d-flex align-items-center">
                         <Button
-                          variant="link"
-                          className="text-danger p-0"
-                          onClick={() => removeFromCart(item.id)}
+                          variant="outline-secondary"
+                          size="sm"
+                          className="rounded-circle quantity-btn"
+                          onClick={() =>
+                            updateQuantity(
+                              item.id,
+                              Math.max(1, item.quantity - 1)
+                            )
+                          }
+                          disabled={item.quantity <= 1}
                         >
-                          <i className="bi bi-trash"></i>
+                          <i className="bi bi-dash"></i>
                         </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th colSpan="3" className="text-end">
-                      Total:
-                    </th>
-                    <th>₱{getTotalPrice()}</th>
-                    <th></th>
-                  </tr>
-                </tfoot>
-              </Table>
-            </>
+                        <span className="quantity-display">
+                          {item.quantity}
+                        </span>
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          className="rounded-circle quantity-btn"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
+                        >
+                          <i className="bi bi-plus"></i>
+                        </Button>
+                      </div>
+                    </Col>
+                    <Col xs={4} md={2} className="text-end">
+                      <span className="cart-item-total fw-bold">
+                        ₱{(item.price * item.quantity).toFixed(2)}
+                      </span>
+                    </Col>
+                    <Col xs={2} md={1} className="text-center">
+                      <Button
+                        variant="link"
+                        className="text-danger remove-item-btn p-0"
+                        onClick={() => removeFromCart(item.id)}
+                        title="Remove item"
+                      >
+                        <i className="bi bi-trash"></i>
+                      </Button>
+                    </Col>
+                  </Row>
+                </div>
+              ))}
+
+              <div className="cart-summary mt-4">
+                <Row className="fw-bold">
+                  <Col xs={8} className="text-end">
+                    Total:
+                  </Col>
+                  <Col xs={4} md={3} className="text-end pe-4">
+                    ₱{getTotalPrice()}
+                  </Col>
+                </Row>
+              </div>
+            </div>
           )}
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleContinueShopping}>
-            Continue Shopping
-          </Button>
-          <Button
-            variant="primary"
-            disabled={cartItems.length === 0}
-            as={Link}
-            to="/order"
-            onClick={handleCloseCart}
-          >
-            Checkout
-          </Button>
-        </Modal.Footer>
+
+        {cartItems.length > 0 && (
+          <Modal.Footer className="justify-content-between bg-white border-top-0">
+            <Button
+              variant="outline-secondary"
+              onClick={handleContinueShopping}
+            >
+              <i className="bi bi-arrow-left me-2"></i>
+              Continue Shopping
+            </Button>
+            <Button
+              variant="primary"
+              as={Link}
+              to="/order"
+              onClick={handleCloseCart}
+              className="checkout-btn"
+            >
+              Proceed to Checkout
+              <i className="bi bi-arrow-right ms-2"></i>
+            </Button>
+          </Modal.Footer>
+        )}
       </Modal>
     </>
   );

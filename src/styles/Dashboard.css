@@ -1,0 +1,33 @@
+.spin-animation {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.stats-card {
+  transition: all 0.3s ease-in-out;
+}
+
+.stats-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stats-icon {
+  font-size: 24px;
+  color: #6c757d;
+  opacity: 0.7;
+}
+
+.dashboard-title {
+  font-weight: 600;
+  color: #343a40;
+}

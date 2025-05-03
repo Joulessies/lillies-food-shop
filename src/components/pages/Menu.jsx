@@ -8,34 +8,30 @@ import {
   Button,
   Form,
   Alert,
+  Nav,
+  Spinner
 } from "react-bootstrap";
 import "../../styles/Menu.css";
 import { useCart } from "../../context/CartContext";
-
-// Burgers
-import Classic from "../../assets/images/Burgers/classic.avif";
-import Fancy from "../../assets/images/Burgers/fancy.avif";
-import Elegant from "../../assets/images/Burgers/elegant.avif";
-
-// Fries
-import GoldenFries from "../../assets/images/Fries/goldenfries.webp";
-import HalfAndHalf from "../../assets/images/Fries/half-and-half.webp";
-import SweetFries from "../../assets/images/Fries/sweetfries.webp";
-
-// Beverages
-import Lemonade from "../../assets/images/Beverages/lemonade.avif";
-import IceTea from "../../assets/images/Beverages/ice-tea.avif";
-import HalfAndHalfLemonAndTea from "../../assets/images/Beverages/half-tea-half-lemon.avif";
+import { fetchMenuCategories, fetchMenuItems } from "../../services/apiService";
 
 const Menu = () => {
   const [show, setShow] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [showAlert, setShowAlert] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [menuItems, setMenuItems] = useState([]);
   const audioRef = useRef(null);
+  
+  // Create refs for each category section
+  const categoryRefs = useRef({});
 
   const { addToCart } = useCart();
 
+  // Initialize audio
   useEffect(() => {
     try {
       audioRef.current = new Audio("/success-sound.mp3");
@@ -61,6 +57,85 @@ const Menu = () => {
     }
   }, []);
 
+  // Load menu data from API
+  useEffect(() => {
+    const loadMenuData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch categories
+        const categories = await fetchMenuCategories();
+        
+        if (categories && categories.length > 0) {
+          // Set first category as active by default
+          setActiveCategory(categories[0].name);
+          
+          // Fetch menu items for all categories
+          const items = await fetchMenuItems();
+          
+          // Organize items by category
+          const organizedItems = categories.map(category => {
+            return {
+              id: category.id,
+              category: category.name,
+              items: items.filter(item => item.category_id === category.id)
+            };
+          });
+          
+          setMenuItems(organizedItems);
+        }
+        
+        setError(null);
+      } catch (err) {
+        console.error("Failed to load menu data:", err);
+        setError("Failed to load menu. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadMenuData();
+  }, []);
+  
+  // Handle scroll to track active category
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 150;
+      
+      // Find which section is currently in view
+      for (const category of menuItems) {
+        const element = categoryRefs.current[category.category];
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (
+            scrollPosition >= offsetTop &&
+            scrollPosition < offsetTop + offsetHeight
+          ) {
+            setActiveCategory(category.category);
+            break;
+          }
+        }
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [menuItems]);
+
+  // Scroll to category section
+  const scrollToCategory = (categoryName) => {
+    const element = categoryRefs.current[categoryName];
+    if (element) {
+      const yOffset = -100; // Adjust based on your navbar height
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+      setActiveCategory(categoryName);
+    }
+  };
+
+  // Handle showing item detail
   const handleShow = (item) => {
     setSelectedItem(item);
     setQuantity(1);
@@ -94,96 +169,32 @@ const Menu = () => {
     handleClose();
   };
 
-  // Functionality: Store the Menu Data
-  const menuItems = [
-    {
-      id: 1,
-      category: "Burgers",
-      items: [
-        {
-          id: 101,
-          name: "Classic",
-          description:
-            "Beef patty, lettuce, tomato, onion, and special sauce on a potato bun",
-          price: 120,
-          image: Classic,
-        },
-        {
-          id: 102,
-          name: "Fancy",
-          description:
-            "Beef patty, cheddar cheese, lettuce, tomato, onion, and special sauce",
-          price: 130,
-          image: Fancy,
-        },
-        {
-          id: 140,
-          name: "Elegant",
-          description:
-            "Beef patty, bacon, lettuce, tomato, onion, and special sauce",
-          price: 100,
-          image: Elegant,
-        },
-      ],
-    },
-    {
-      id: 2,
-      category: "Sides",
-      items: [
-        {
-          id: 201,
-          name: "Golden Fries",
-          description:
-            "Crispy golden french fries with our signature seasoning",
-          price: 100,
-          image: GoldenFries,
-        },
-        {
-          id: 202,
-          name: "Sweet Fries",
-          description:
-            "Sweet potato fries are a delicious alternative to traditional french fries, made from sweet potatoes instead of regular potatoes. ",
-          price: 140,
-          image: SweetFries,
-        },
-        {
-          id: 203,
-          name: "Half and Half",
-          description:
-            "Enjoy the best of both worlds with our Half and Half platter - crispy golden potato fries paired with sweet potato fries side by side.",
-          price: 110,
-          image: HalfAndHalf,
-        },
-      ],
-    },
-    {
-      id: 3,
-      category: "Beverages",
-      items: [
-        {
-          id: 301,
-          name: "Soft Drinks",
-          description: "Freshly homemade lemonade",
-          price: 70,
-          image: Lemonade,
-        },
-        {
-          id: 302,
-          name: "Milkshakes",
-          description: "Freshly brewed ice tea, sweetend or unsweetened",
-          price: 70,
-          image: IceTea,
-        },
-        {
-          id: 303,
-          name: "Iced Tea",
-          description: "Freshly brewed ice tea and lemonade combined together",
-          price: 65,
-          image: HalfAndHalfLemonAndTea,
-        },
-      ],
-    },
-  ];
+  // Show loading spinner when loading data
+  if (loading) {
+    return (
+      <Container className="text-center py-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+        <p className="mt-3">Loading menu...</p>
+      </Container>
+    );
+  }
+
+  // Show error message if loading failed
+  if (error) {
+    return (
+      <Container className="py-5">
+        <Alert variant="danger">
+          <Alert.Heading>Error Loading Menu</Alert.Heading>
+          <p>{error}</p>
+          <Button variant="outline-danger" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container className="menu-page py-5">
@@ -199,8 +210,29 @@ const Menu = () => {
       )}
       <h1 className="text-center mb-5">Our Menu</h1>
 
+      {/* Category Navigation */}
+      <div className="category-nav-container mb-4">
+        <Nav className="justify-content-center category-navigation">
+          {menuItems.map((category) => (
+            <Nav.Item key={category.id}>
+              <Nav.Link 
+                className={activeCategory === category.category ? 'active' : ''}
+                onClick={() => scrollToCategory(category.category)}
+              >
+                {category.category}
+              </Nav.Link>
+            </Nav.Item>
+          ))}
+        </Nav>
+      </div>
+
       {menuItems.map((category) => (
-        <div key={category.id} className="menu-category mb-5">
+        <div 
+          key={category.id} 
+          className="menu-category mb-5"
+          id={category.category.toLowerCase().replace(/\s+/g, '-')}
+          ref={(el) => (categoryRefs.current[category.category] = el)}
+        >
           <h2 className="category-title mb-4">{category.category}</h2>
           <Row>
             {category.items.map((item) => (
