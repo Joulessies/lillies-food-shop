@@ -1,21 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Form, Button, Alert, Spinner, Row, Col, Image } from 'react-bootstrap';
-import { useParams, useNavigate } from 'react-router-dom';
-import { FaSave, FaArrowLeft, FaUpload } from 'react-icons/fa';
-// import { fetchProduct, createProduct, updateProduct, fetchCategories } from '../../../services/apiService';
+import React, { useState, useEffect } from "react";
+import {
+  Form,
+  Button,
+  Card,
+  Row,
+  Col,
+  Spinner,
+  Alert,
+  Image,
+} from "react-bootstrap";
+import { useParams, useNavigate } from "react-router-dom";
+import { FaSave, FaArrowLeft } from "react-icons/fa";
+import {
+  fetchProduct,
+  createProduct,
+  updateProduct,
+  fetchCategories,
+  createCategory,
+} from "../../../services/apiService";
 
 const ProductForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = !!id;
-  
+
   const [product, setProduct] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category_id: '',
+    name: "",
+    description: "",
+    price: "",
+    category_id: "",
     active: true,
-    image: null
+    image: null,
   });
   const [imagePreview, setImagePreview] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -23,156 +38,178 @@ const ProductForm = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [validated, setValidated] = useState(false);
-  
+  const [imageError, setImageError] = useState(null);
+  const [creatingCategory, setCreatingCategory] = useState(false);
+
   // Load categories and product if editing
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        
-        // Mock categories data
-        const mockCategories = [
-          { id: 1, name: 'Burgers' },
-          { id: 2, name: 'Sides' },
-          { id: 3, name: 'Beverages' },
-          { id: 4, name: 'Desserts' },
-        ];
-        
-        setCategories(mockCategories);
-        
+
+        // Load categories first
+        const categoriesData = await fetchCategories();
+        setCategories(categoriesData);
+
+        // Check if we need to ensure default categories exist
+        const defaultCategories = ["Burgers", "Sides", "Beverages"];
+        const existingCategoryNames = categoriesData.map((c) => c.name);
+
+        const missingCategories = defaultCategories.filter(
+          (name) => !existingCategoryNames.includes(name)
+        );
+
+        // Create missing default categories
+        if (missingCategories.length > 0) {
+          setCreatingCategory(true);
+
+          const newCategoryPromises = missingCategories.map((name) =>
+            createCategory({
+              name,
+              description: `${name} category`,
+              active: true,
+            })
+          );
+
+          const newCategories = await Promise.all(newCategoryPromises);
+
+          // Refresh categories list
+          const updatedCategories = await fetchCategories();
+          setCategories(updatedCategories);
+          setCreatingCategory(false);
+        }
+
+        // If editing, load product data
         if (isEditing) {
-          // Load product data if editing
-          const mockProduct = {
-            id: parseInt(id),
-            name: id === '101' ? 'Classic Burger' : 'Test Product',
-            description: 'Product description goes here',
-            price: 120.00,
-            category_id: 1,
-            active: true,
-            image: '/assets/images/Burgers/classic.avif'
-          };
-          
-          setProduct(mockProduct);
-          setImagePreview(mockProduct.image);
-        } else {
-          // Set default category if not editing
-          if (mockCategories.length > 0) {
-            setProduct(prev => ({ ...prev, category_id: mockCategories[0].id }));
+          const productData = await fetchProduct(id);
+          setProduct(productData);
+
+          if (productData.image) {
+            setImagePreview(productData.image);
           }
         }
-        
-        /* UNCOMMENT WHEN YOUR BACKEND IS READY
-        const categoriesResponse = await fetchCategories();
-        setCategories(categoriesResponse);
-        
-        if (isEditing) {
-          const productResponse = await fetchProduct(id);
-          setProduct(productResponse);
-          setImagePreview(productResponse.image);
-        } else if (categoriesResponse.length > 0) {
-          setProduct(prev => ({ ...prev, category_id: categoriesResponse[0].id }));
-        }
-        */
+
+        setError(null);
       } catch (err) {
-        setError('Failed to load data');
-        console.error(err);
+        console.error("Error loading form data:", err);
+        setError("Failed to load data. Please try again.");
       } finally {
         setLoading(false);
       }
     };
-    
+
     loadData();
   }, [id, isEditing]);
-  
+
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-    
-    if (type === 'checkbox') {
-      setProduct(prev => ({ ...prev, [name]: checked }));
-    } else if (type === 'file') {
-      const file = files[0];
-      setProduct(prev => ({ ...prev, [name]: file }));
-      
-      // Create a preview
-      if (file) {
+
+    if (type === "file") {
+      if (files && files[0]) {
+        const file = files[0];
+        if (file.size > 5 * 1024 * 1024) {
+          // 5MB limit
+          setImageError("Image size cannot exceed 5MB");
+          return;
+        }
+
+        if (!file.type.match("image.*")) {
+          setImageError("Please select a valid image file");
+          return;
+        }
+
+        setImageError(null);
+        setProduct((prev) => ({ ...prev, image: file }));
+
+        // Create preview
         const reader = new FileReader();
-        reader.onloadend = () => {
-          setImagePreview(reader.result);
+        reader.onload = (e) => {
+          setImagePreview(e.target.result);
         };
         reader.readAsDataURL(file);
-      } else {
-        setImagePreview(null);
       }
-    } else if (name === 'price') {
-      // Ensure price is a valid number
-      const priceValue = value.replace(/[^0-9.]/g, '');
-      setProduct(prev => ({ ...prev, [name]: priceValue }));
     } else {
-      setProduct(prev => ({ ...prev, [name]: value }));
+      const newValue = type === "checkbox" ? checked : value;
+      setProduct((prev) => ({ ...prev, [name]: newValue }));
     }
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
+      e.preventDefault();
       e.stopPropagation();
       setValidated(true);
       return;
     }
-    
-    // Convert price to number
-    const formattedProduct = {
-      ...product,
-      price: parseFloat(product.price),
-      category_id: parseInt(product.category_id)
-    };
-    
+
+    if (imageError) {
+      return;
+    }
+
     try {
       setSaving(true);
-      
-      /* UNCOMMENT WHEN YOUR BACKEND IS READY
+
+      // Create FormData for file upload
+      const formData = new FormData();
+      Object.keys(product).forEach((key) => {
+        if (product[key] !== null && product[key] !== undefined) {
+          formData.append(key, product[key]);
+        }
+      });
+
       if (isEditing) {
-        await updateProduct(id, formattedProduct);
+        await updateProduct(id, formData);
       } else {
-        await createProduct(formattedProduct);
+        await createProduct(formData);
       }
-      */
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Navigate back to products list
-      navigate('/admin/products');
+
+      navigate("/admin/products", { state: { refresh: true } });
     } catch (err) {
-      setError(`Failed to ${isEditing ? 'update' : 'create'} product`);
-      console.error(err);
+      console.error("Error saving product:", err);
+      setError(
+        `Failed to ${isEditing ? "update" : "create"} product. Please try again.`
+      );
     } finally {
       setSaving(false);
     }
   };
-  
-  if (loading) return <div className="text-center mt-5"><Spinner animation="border" /></div>;
-  
+
+  if (loading || creatingCategory) {
+    return (
+      <div className="text-center my-5">
+        <Spinner animation="border" />
+        <p className="mt-3">
+          {creatingCategory ? "Setting up default categories..." : "Loading..."}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="product-form">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="mb-0">{isEditing ? 'Edit Product' : 'Add Product'}</h2>
-        <Button variant="secondary" onClick={() => navigate('/admin/products')}>
+        <h2>{isEditing ? "Edit Product" : "Add New Product"}</h2>
+        <Button variant="secondary" onClick={() => navigate("/admin/products")}>
           <FaArrowLeft className="me-2" /> Back to Products
         </Button>
       </div>
-      
-      {error && <Alert variant="danger">{error}</Alert>}
-      
+
+      {error && (
+        <Alert variant="danger" className="mb-4">
+          {error}
+        </Alert>
+      )}
+
       <Card>
         <Card.Body>
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Row>
               <Col md={8}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Name</Form.Label>
+                  <Form.Label>Product Name</Form.Label>
                   <Form.Control
                     type="text"
                     name="name"
@@ -184,36 +221,35 @@ const ProductForm = () => {
                     Please provide a product name.
                   </Form.Control.Feedback>
                 </Form.Group>
-                
+
                 <Form.Group className="mb-3">
                   <Form.Label>Description</Form.Label>
                   <Form.Control
                     as="textarea"
-                    name="description"
                     rows={3}
-                    value={product.description || ''}
+                    name="description"
+                    value={product.description || ""}
                     onChange={handleChange}
                   />
                 </Form.Group>
-                
+
                 <Row>
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Price (₱)</Form.Label>
                       <Form.Control
-                        type="text"
+                        type="number"
+                        step="0.01"
                         name="price"
                         value={product.price}
                         onChange={handleChange}
                         required
-                        placeholder="0.00"
                       />
                       <Form.Control.Feedback type="invalid">
                         Please provide a valid price.
                       </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
-                  
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Category</Form.Label>
@@ -224,11 +260,28 @@ const ProductForm = () => {
                         required
                       >
                         <option value="">Select a category</option>
-                        {categories.map(category => (
-                          <option key={category.id} value={category.id}>
-                            {category.name}
-                          </option>
-                        ))}
+                        {categories
+                          .sort((a, b) => {
+                            // Sort to prioritize burger, sides, beverages first
+                            const defaultOrder = [
+                              "Burgers",
+                              "Sides",
+                              "Beverages",
+                            ];
+                            const aIndex = defaultOrder.indexOf(a.name);
+                            const bIndex = defaultOrder.indexOf(b.name);
+
+                            if (aIndex !== -1 && bIndex !== -1)
+                              return aIndex - bIndex;
+                            if (aIndex !== -1) return -1;
+                            if (bIndex !== -1) return 1;
+                            return a.name.localeCompare(b.name);
+                          })
+                          .map((category) => (
+                            <option key={category.id} value={category.id}>
+                              {category.name}
+                            </option>
+                          ))}
                       </Form.Select>
                       <Form.Control.Feedback type="invalid">
                         Please select a category.
@@ -236,11 +289,10 @@ const ProductForm = () => {
                     </Form.Group>
                   </Col>
                 </Row>
-                
+
                 <Form.Group className="mb-3">
                   <Form.Check
                     type="checkbox"
-                    id="product-active"
                     label="Active"
                     name="active"
                     checked={product.active}
@@ -248,55 +300,49 @@ const ProductForm = () => {
                   />
                 </Form.Group>
               </Col>
-              
+
               <Col md={4}>
                 <Form.Group className="mb-3">
                   <Form.Label>Product Image</Form.Label>
-                  <div className="text-center mb-3">
-                    {imagePreview ? (
-                      <Image 
-                        src={imagePreview} 
-                        alt="Product preview" 
-                        className="img-thumbnail product-image-preview"
-                        style={{ maxHeight: '200px' }}
+                  <Form.Control
+                    type="file"
+                    name="image"
+                    onChange={handleChange}
+                    accept="image/*"
+                  />
+                  {imageError && (
+                    <div className="text-danger mt-2">{imageError}</div>
+                  )}
+                  <div className="text-muted mt-1">
+                    <small>Max size: 5MB. Format: JPG, PNG, GIF.</small>
+                  </div>
+
+                  {imagePreview && (
+                    <div className="mt-3 text-center">
+                      <Image
+                        src={imagePreview}
+                        alt="Product preview"
+                        thumbnail
+                        style={{ maxHeight: "200px" }}
                       />
-                    ) : (
-                      <div className="product-image-placeholder">
-                        No image selected
-                      </div>
-                    )}
-                  </div>
-                  <div className="d-grid">
-                    <Button
-                      variant="outline-secondary"
-                      as="label"
-                      htmlFor="product-image-upload"
-                      className="d-flex align-items-center justify-content-center"
-                    >
-                      <FaUpload className="me-2" /> Upload Image
-                    </Button>
-                    <Form.Control
-                      type="file"
-                      id="product-image-upload"
-                      name="image"
-                      onChange={handleChange}
-                      accept="image/*"
-                      style={{ display: 'none' }}
-                    />
-                  </div>
+                    </div>
+                  )}
                 </Form.Group>
               </Col>
             </Row>
-            
-            <div className="mt-3">
-              <Button 
-                type="submit" 
-                variant="primary" 
+
+            <div className="mt-4 d-flex justify-content-end">
+              <Button
+                type="submit"
+                variant="primary"
                 disabled={saving}
                 className="d-flex align-items-center"
               >
-                {saving && <Spinner animation="border" size="sm" className="me-2" />}
-                <FaSave className="me-2" /> {isEditing ? 'Update' : 'Create'} Product
+                {saving && (
+                  <Spinner animation="border" size="sm" className="me-2" />
+                )}
+                <FaSave className="me-2" /> {isEditing ? "Update" : "Save"}{" "}
+                Product
               </Button>
             </div>
           </Form>

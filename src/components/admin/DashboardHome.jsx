@@ -1,9 +1,20 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Card, Table, Badge, Spinner, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { FaBox, FaList, FaShoppingCart, FaSync } from 'react-icons/fa';
-import { fetchDashboardStats } from '../../services/apiService';
-import SalesChart from './charts/SalesChart';
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Row,
+  Col,
+  Card,
+  Table,
+  Badge,
+  Spinner,
+  Button,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { FaBox, FaList, FaShoppingCart, FaSync, FaPlus } from "react-icons/fa";
+import { fetchDashboardStats } from "../../services/apiService";
+import SalesChart from "./charts/SalesChart";
+import "../../styles/Dashboard.css";
 
 const DashboardHome = () => {
   const [stats, setStats] = useState({
@@ -12,12 +23,15 @@ const DashboardHome = () => {
     totalOrders: 0,
     recentOrders: [],
     lowStockProducts: [],
-    categorySales: []
+    categorySales: [],
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [addingProduct, setAddingProduct] = useState(false);
+
+  const navigate = useNavigate();
 
   // Fetch dashboard data
   const fetchDashboardData = useCallback(async (showLoadingState = true) => {
@@ -27,49 +41,60 @@ const DashboardHome = () => {
       } else {
         setRefreshing(true);
       }
-      
+
       // Fetch data from API service
       const data = await fetchDashboardStats();
-      
+
       setStats({
         totalProducts: data.total_products || data.totalProducts || 0,
         totalCategories: data.total_categories || data.totalCategories || 0,
         totalOrders: data.total_orders || data.totalOrders || 0,
         recentOrders: data.recent_orders || data.recentOrders || [],
-        lowStockProducts: data.low_stock_products || data.lowStockProducts || [],
-        categorySales: data.category_sales || data.categorySales || []
+        lowStockProducts:
+          data.low_stock_products || data.lowStockProducts || [],
+        categorySales: data.category_sales || data.categorySales || [],
       });
-      
+
       setLastUpdated(new Date());
       setError(null);
     } catch (err) {
-      console.error('Dashboard data fetch error:', err);
-      setError('Failed to load dashboard data. Please try again.');
+      console.error("Dashboard data fetch error:", err);
+      setError("Failed to load dashboard data. Please try again.");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, []);
-  
+
   // Initial data load
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
-  
+
   // Set up polling for real-time updates (every 30 seconds)
   useEffect(() => {
     const interval = setInterval(() => {
       fetchDashboardData(false); // Don't show loading spinner for automatic updates
     }, 30000); // 30 seconds
-    
+
     return () => clearInterval(interval);
   }, [fetchDashboardData]);
-  
+
   // Manual refresh handler
   const handleRefresh = () => {
     fetchDashboardData(false);
   };
-  
+
+  // Add new product handler
+  const handleAddNewProduct = () => {
+    setAddingProduct(true);
+    setTimeout(() => {
+      navigate("/admin/products/new", {
+        state: { refresh: true },
+      });
+    }, 300);
+  };
+
   if (loading) {
     return (
       <div className="text-center my-5 py-5">
@@ -78,7 +103,7 @@ const DashboardHome = () => {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="alert alert-danger mt-3">
@@ -90,22 +115,12 @@ const DashboardHome = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="dashboard-home">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="dashboard-title mb-0">Dashboard Overview</h2>
         <div>
-          <Button 
-            variant="outline-primary" 
-            size="sm" 
-            onClick={handleRefresh} 
-            disabled={refreshing}
-            className="d-flex align-items-center"
-          >
-            <FaSync className={`me-2 ${refreshing ? 'spin-animation' : ''}`} />
-            {refreshing ? 'Refreshing...' : 'Refresh'}
-          </Button>
           {lastUpdated && (
             <div className="text-muted mt-1 small">
               Last updated: {lastUpdated.toLocaleTimeString()}
@@ -113,7 +128,7 @@ const DashboardHome = () => {
           )}
         </div>
       </div>
-      
+
       <Row className="stats-cards mb-4">
         <Col md={4}>
           <Card className="stats-card">
@@ -130,7 +145,7 @@ const DashboardHome = () => {
             </Card.Body>
           </Card>
         </Col>
-        
+
         <Col md={4}>
           <Card className="stats-card">
             <Card.Body>
@@ -146,7 +161,7 @@ const DashboardHome = () => {
             </Card.Body>
           </Card>
         </Col>
-        
+
         <Col md={4}>
           <Card className="stats-card">
             <Card.Body>
@@ -163,13 +178,15 @@ const DashboardHome = () => {
           </Card>
         </Col>
       </Row>
-      
+
       <Row className="mb-4">
         <Col lg={8}>
           <Card>
             <Card.Header className="d-flex justify-content-between align-items-center">
               <h5 className="mb-0">Recent Orders</h5>
-              <Link to="/admin/orders" className="btn btn-sm btn-primary">View All</Link>
+              <Link to="/admin/orders" className="btn btn-sm btn-primary">
+                View All
+              </Link>
             </Card.Header>
             <Card.Body>
               <Table responsive striped hover>
@@ -184,29 +201,42 @@ const DashboardHome = () => {
                 </thead>
                 <tbody>
                   {stats.recentOrders.length > 0 ? (
-                    stats.recentOrders.map(order => (
+                    stats.recentOrders.map((order) => (
                       <tr key={order.id}>
                         <td>
-                          <Link to={`/admin/orders/${order.id}`}>#{order.id}</Link>
+                          <Link to={`/admin/orders/${order.id}`}>
+                            #{order.id}
+                          </Link>
                         </td>
                         <td>{order.customer_name}</td>
                         <td>
-                          <Badge bg={
-                            order.status === 'delivered' ? 'success' :
-                            order.status === 'processing' ? 'warning' :
-                            order.status === 'shipped' ? 'primary' :
-                            order.status === 'cancelled' ? 'danger' : 'secondary'
-                          }>
+                          <Badge
+                            bg={
+                              order.status === "delivered"
+                                ? "success"
+                                : order.status === "processing"
+                                  ? "warning"
+                                  : order.status === "shipped"
+                                    ? "primary"
+                                    : order.status === "cancelled"
+                                      ? "danger"
+                                      : "secondary"
+                            }
+                          >
                             {order.status}
                           </Badge>
                         </td>
-                        <td>{new Date(order.order_date).toLocaleDateString()}</td>
-                        <td>${parseFloat(order.total_amount).toFixed(2)}</td>
+                        <td>
+                          {new Date(order.order_date).toLocaleDateString()}
+                        </td>
+                        <td>₱{parseFloat(order.total_amount).toFixed(2)}</td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="5" className="text-center">No recent orders</td>
+                      <td colSpan="5" className="text-center">
+                        No recent orders
+                      </td>
                     </tr>
                   )}
                 </tbody>
@@ -214,7 +244,7 @@ const DashboardHome = () => {
             </Card.Body>
           </Card>
         </Col>
-        
+
         <Col lg={4}>
           <Card>
             <Card.Header>
@@ -230,13 +260,15 @@ const DashboardHome = () => {
                 </thead>
                 <tbody>
                   {stats.lowStockProducts.length > 0 ? (
-                    stats.lowStockProducts.map(product => (
+                    stats.lowStockProducts.map((product) => (
                       <tr key={product.id}>
                         <td>
-                          <Link to={`/admin/products/edit/${product.id}`}>{product.name}</Link>
+                          <Link to={`/admin/products/edit/${product.id}`}>
+                            {product.name}
+                          </Link>
                         </td>
                         <td>
-                          <Badge bg={product.stock < 5 ? 'danger' : 'warning'}>
+                          <Badge bg={product.stock < 5 ? "danger" : "warning"}>
                             {product.stock}
                           </Badge>
                         </td>
@@ -244,7 +276,9 @@ const DashboardHome = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="2" className="text-center">No low stock products</td>
+                      <td colSpan="2" className="text-center">
+                        No low stock products
+                      </td>
                     </tr>
                   )}
                 </tbody>
@@ -253,8 +287,8 @@ const DashboardHome = () => {
           </Card>
         </Col>
       </Row>
-      
-      <Row>
+
+      <Row className="mb-4">
         <Col>
           <Card>
             <Card.Header>
@@ -266,6 +300,28 @@ const DashboardHome = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* Floating Action Button for adding new product */}
+      <div className="floating-action-container">
+        <OverlayTrigger
+          placement="left"
+          overlay={<Tooltip>Add a new product to your inventory</Tooltip>}
+        >
+          <Button
+            variant="primary"
+            onClick={handleAddNewProduct}
+            disabled={addingProduct}
+            className="floating-action-button"
+          >
+            {addingProduct ? (
+              <Spinner animation="border" size="sm" />
+            ) : (
+              <FaPlus />
+            )}
+            <span className="floating-button-text">Add New Product</span>
+          </Button>
+        </OverlayTrigger>
+      </div>
     </div>
   );
 };

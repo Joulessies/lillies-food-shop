@@ -1,180 +1,614 @@
-import axios from 'axios';
+import axios from "axios";
 
 // Use a hardcoded API URL to avoid environment variable issues
-const API_URL = 'http://localhost:8000/api';
+const API_URL = "http://localhost:8000/api";
 
-// Flag to control mock data usage - Set to true to use mock data instead of API calls
-const USE_MOCK_DATA = true; // Set to false when your backend is ready
+const USE_MOCK_DATA = false; // Set to false now that the backend is ready
+
+// Mock data for development
+const mockData = {
+  users: {
+    profile: {
+      id: 1,
+      name: "John Doe",
+      email: "john@example.com",
+      phone: "123-456-7890",
+      address: "123 Main St",
+    },
+    all: [
+      {
+        id: 1,
+        name: "Admin User",
+        email: "admin@example.com",
+        phone: "555-123-4567",
+        role: "admin",
+        created_at: "2023-01-15T08:30:00Z",
+        active: true,
+        is_staff: true,
+        is_superuser: true,
+      },
+      {
+        id: 2,
+        name: "John Doe",
+        email: "john@example.com",
+        phone: "555-234-5678",
+        role: "customer",
+        created_at: "2023-02-20T10:15:00Z",
+        active: true,
+      },
+      {
+        id: 3,
+        name: "Jane Smith",
+        email: "jane@example.com",
+        phone: "555-345-6789",
+        role: "customer",
+        created_at: "2023-03-05T14:45:00Z",
+        active: true,
+      },
+      {
+        id: 4,
+        name: "Robert Johnson",
+        email: "robert@example.com",
+        phone: "555-456-7890",
+        role: "staff",
+        created_at: "2023-02-28T09:20:00Z",
+        active: false,
+      },
+    ],
+  },
+  categories: [
+    { id: 1, name: "Burgers", description: "Juicy burgers", active: true },
+    { id: 2, name: "Sides", description: "Delicious sides", active: true },
+    {
+      id: 3,
+      name: "Beverages",
+      description: "Refreshing drinks",
+      active: true,
+    },
+  ],
+  products: [
+    {
+      id: 1,
+      name: "Classic Burger",
+      description: "Our signature burger with cheese, lettuce, and tomato",
+      price: 9.99,
+      category_id: 1,
+      active: true,
+      image: "https://via.placeholder.com/300x200",
+    },
+    {
+      id: 2,
+      name: "French Fries",
+      description: "Crispy golden fries",
+      price: 3.99,
+      category_id: 2,
+      active: true,
+      image: "https://via.placeholder.com/300x200",
+    },
+    {
+      id: 3,
+      name: "Cola",
+      description: "Refreshing cola drink",
+      price: 2.49,
+      category_id: 3,
+      active: true,
+      image: "https://via.placeholder.com/300x200",
+    },
+  ],
+  orders: [
+    {
+      id: 1,
+      customer_name: "Alice Johnson",
+      customer_email: "alice@example.com",
+      contact_number: "555-123-4567",
+      shipping_address: "123 Main St, City",
+      order_date: "2023-04-15T10:30:00Z",
+      status: "delivered",
+      total_amount: 16.47,
+      items: [
+        {
+          id: 1,
+          product_id: 1,
+          product_name: "Classic Burger",
+          quantity: 1,
+          price: 9.99,
+        },
+        {
+          id: 2,
+          product_id: 3,
+          product_name: "Cola",
+          quantity: 2,
+          price: 2.49,
+        },
+      ],
+    },
+    {
+      id: 2,
+      customer_name: "Bob Smith",
+      customer_email: "bob@example.com",
+      contact_number: "555-987-6543",
+      shipping_address: "456 Oak St, Town",
+      order_date: "2023-04-16T14:45:00Z",
+      status: "processing",
+      total_amount: 13.98,
+      items: [
+        {
+          id: 1,
+          product_id: 2,
+          product_name: "French Fries",
+          quantity: 2,
+          price: 3.99,
+        },
+        {
+          id: 2,
+          product_id: 3,
+          product_name: "Cola",
+          quantity: 2,
+          price: 2.49,
+        },
+      ],
+    },
+  ],
+  dashboard: {
+    stats: {
+      totalProducts: 3,
+      totalCategories: 3,
+      totalOrders: 2,
+      recentOrders: [
+        {
+          id: 2,
+          customer_name: "Bob Smith",
+          total_amount: 13.98,
+          status: "processing",
+          order_date: "2023-04-16T14:45:00Z",
+        },
+        {
+          id: 1,
+          customer_name: "Alice Johnson",
+          total_amount: 16.47,
+          status: "delivered",
+          order_date: "2023-04-15T10:30:00Z",
+        },
+      ],
+      lowStockProducts: [
+        { id: 1, name: "Classic Burger", stock: 5 },
+        { id: 3, name: "Cola", stock: 3 },
+      ],
+      categorySales: [
+        { category: "Burgers", sales: 450 },
+        { category: "Sides", sales: 320 },
+        { category: "Beverages", sales: 280 },
+      ],
+    },
+  },
+};
+
+// Mock API call helper function with delay to simulate real API calls
+const mockApiCall = (data) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(data);
+    }, 500); // 500ms delay to simulate network
+  });
+};
 
 // Create axios instance with authentication headers
 const apiClient = axios.create({
-  baseURL: API_URL
+  baseURL: API_URL,
 });
 
 // Add authorization header to requests
 apiClient.interceptors.request.use(
-  config => {
-    // Only try to add auth header if we're not using mock data
-    if (!USE_MOCK_DATA) {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      if (user.token) {
-        config.headers['Authorization'] = `Bearer ${user.token}`;
-      }
+  (config) => {
+    // Get the authentication token from localStorage
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (user.token) {
+      // Format the token as expected by Django REST Framework
+      config.headers["Authorization"] = `Token ${user.token}`;
     }
     return config;
   },
-  error => Promise.reject(error)
+  (error) => Promise.reject(error)
 );
 
 // Add response interceptor to handle errors consistently
 apiClient.interceptors.response.use(
-  response => response,
-  error => {
+  (response) => response,
+  (error) => {
     if (USE_MOCK_DATA) {
       // If using mock data, don't show network errors
-      console.warn('API Error intercepted in mock mode:', error.message);
-      return Promise.reject(new Error('API error in mock mode'));
+      console.warn("API Error intercepted in mock mode:", error.message);
+      return Promise.reject(new Error("API error in mock mode"));
     }
     return Promise.reject(error);
   }
 );
 
-// Mock data
-const mockData = {
-  categories: [
-    { id: 1, name: 'Burgers', description: 'Delicious hamburgers and cheeseburgers', active: true },
-    { id: 2, name: 'Sides', description: 'French fries, onion rings and more', active: true },
-    { id: 3, name: 'Beverages', description: 'Soft drinks, shakes, and coffee', active: true },
-    { id: 4, name: 'Desserts', description: 'Sweet treats to finish your meal', active: false }
-  ],
-  products: [
-    { 
-      id: 101, 
-      name: "Classic Burger", 
-      description: "Beef patty, lettuce, tomato, onion, and special sauce on a potato bun",
-      price: 120.00,
-      category_id: 1,
-      active: true,
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&h=500&q=80"
-    },
-    { 
-      id: 102, 
-      name: "Fancy Burger", 
-      description: "Beef patty, cheddar cheese, lettuce, tomato, onion, and special sauce",
-      price: 130.00,
-      category_id: 1,
-      active: true,
-      image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&h=500&q=80"
-    },
-    { 
-      id: 201, 
-      name: "Golden Fries", 
-      description: "Crispy golden french fries with our signature seasoning",
-      price: 100.00,
-      category_id: 2,
-      active: true,
-      image: "https://images.unsplash.com/photo-1576107232684-1279f390859f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&h=500&q=80"
-    },
-    { 
-      id: 301, 
-      name: "Lemonade", 
-      description: "Freshly homemade lemonade",
-      price: 70.00,
-      category_id: 3,
-      active: true,
-      image: "https://images.unsplash.com/photo-1621263764928-df1444c5e859?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&h=500&q=80"
+// IndexedDB-based user storage system
+
+// Initialize the database
+const initDb = () => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("lilliesShopDB", 1);
+
+    request.onerror = (event) => {
+      console.error("Error opening IndexedDB:", event.target.error);
+      reject(event.target.error);
+    };
+
+    request.onsuccess = (event) => {
+      const db = event.target.result;
+      resolve(db);
+    };
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+
+      // Create users object store (table)
+      if (!db.objectStoreNames.contains("users")) {
+        const usersStore = db.createObjectStore("users", {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+        usersStore.createIndex("email", "email", { unique: true });
+
+        // Add default admin user
+        usersStore.add({
+          name: "Admin User",
+          email: "admin@example.com",
+          password: "password", // In real apps, use hashing
+          phone: "123-456-7890",
+          role: "admin",
+          is_staff: true,
+          is_superuser: true,
+          active: true,
+          created_at: new Date().toISOString(),
+        });
+
+        // Add default regular user
+        usersStore.add({
+          name: "Regular User",
+          email: "user@example.com",
+          password: "password",
+          phone: "987-654-3210",
+          role: "customer",
+          is_staff: false,
+          is_superuser: false,
+          active: true,
+          created_at: new Date().toISOString(),
+        });
+      }
+    };
+  });
+};
+
+// Register a new user
+export const register = async (userData) => {
+  if (USE_MOCK_DATA) {
+    try {
+      const db = await initDb();
+
+      return new Promise((resolve, reject) => {
+        // Check if email exists
+        const checkTransaction = db.transaction(["users"], "readonly");
+        const checkStore = checkTransaction.objectStore("users");
+        const emailIndex = checkStore.index("email");
+        const emailCheck = emailIndex.get(userData.email);
+
+        emailCheck.onsuccess = (event) => {
+          if (event.target.result) {
+            reject(new Error("Email already exists"));
+            return;
+          }
+
+          // Email doesn't exist, proceed with registration
+          const transaction = db.transaction(["users"], "readwrite");
+          const store = transaction.objectStore("users");
+
+          const newUser = {
+            name: userData.name,
+            email: userData.email,
+            password: userData.password, // In real app, hash password
+            phone: userData.phone || "",
+            role: "customer",
+            is_staff: false,
+            is_superuser: false,
+            active: true,
+            created_at: new Date().toISOString(),
+          };
+
+          const request = store.add(newUser);
+
+          request.onsuccess = () => {
+            // Return user without password
+            const { password, ...userWithoutPassword } = newUser;
+            userWithoutPassword.id = request.result; // Add the generated ID
+            resolve(userWithoutPassword);
+          };
+
+          request.onerror = () => {
+            reject(new Error("Failed to register user"));
+          };
+        };
+
+        emailCheck.onerror = () => {
+          reject(new Error("Failed to check email"));
+        };
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      throw error;
     }
-  ],
-  orders: [
-    {
-      id: 1,
-      customer_name: "John Doe",
-      customer_email: "john@example.com",
-      contact_number: "123-456-7890",
-      shipping_address: "123 Main St, City",
-      order_date: "2023-10-15T14:30:00Z",
-      status: "completed",
-      total_amount: 320.00,
-      items: [
-        { id: 1, product_id: 101, product_name: "Classic Burger", quantity: 2, price: 120.00 },
-        { id: 2, product_id: 201, product_name: "Golden Fries", quantity: 1, price: 100.00 }
-      ]
-    },
-    {
-      id: 2,
-      customer_name: "Jane Smith",
-      customer_email: "jane@example.com",
-      contact_number: "098-765-4321",
-      shipping_address: "456 Elm St, Town",
-      order_date: "2023-10-16T10:15:00Z",
-      status: "pending",
-      total_amount: 200.00,
-      items: [
-        { id: 3, product_id: 102, product_name: "Fancy Burger", quantity: 1, price: 130.00 },
-        { id: 4, product_id: 301, product_name: "Lemonade", quantity: 1, price: 70.00 }
-      ]
-    }
-  ],
-  dashboard: {
-    stats: {
-      totalProducts: 12,
-      totalCategories: 4,
-      totalOrders: 245,
-      total_revenue: 28750.00,
-      pending_orders: 12,
-      completed_orders: 233,
-      recentOrders: [
-        {
-          id: 245,
-          customer_name: "Mike Johnson",
-          total_amount: 290.00,
-          status: "pending",
-          order_date: "2023-10-17T09:45:00Z"
-        },
-        {
-          id: 244,
-          customer_name: "Sarah Williams",
-          total_amount: 180.00,
-          status: "completed",
-          order_date: "2023-10-17T08:30:00Z"
-        },
-        {
-          id: 243,
-          customer_name: "David Brown",
-          total_amount: 220.00,
-          status: "shipped",
-          order_date: "2023-10-16T15:20:00Z"
+  } else {
+    try {
+      console.log("Registration data being sent:", userData);
+
+      // Use the correct endpoint with auth/ prefix
+      const response = await apiClient.post("/auth/register/", userData);
+
+      console.log("Registration successful:", response.data);
+
+      // Store user data in localStorage for immediate login if applicable
+      if (response.data.token) {
+        localStorage.setItem("user", JSON.stringify(response.data));
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error("Registration error details:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+
+      // Extract error message from the response if available
+      if (error.response?.data) {
+        // Django may return validation errors in different formats
+        const errorData = error.response.data;
+
+        if (typeof errorData === "string") {
+          throw new Error(errorData);
+        } else if (errorData.detail) {
+          throw new Error(errorData.detail);
+        } else if (errorData.email) {
+          throw new Error(
+            `Email error: ${Array.isArray(errorData.email) ? errorData.email.join(", ") : errorData.email}`
+          );
+        } else if (errorData.password) {
+          throw new Error(
+            `Password error: ${Array.isArray(errorData.password) ? errorData.password.join(", ") : errorData.password}`
+          );
+        } else if (errorData.name) {
+          throw new Error(
+            `Name error: ${Array.isArray(errorData.name) ? errorData.name.join(", ") : errorData.name}`
+          );
+        } else {
+          throw new Error(
+            "Registration failed. Please check your information and try again."
+          );
         }
-      ],
-      lowStockProducts: [
-        { id: 103, name: "Veggie Burger", stock: 3 },
-        { id: 202, name: "Onion Rings", stock: 5 },
-        { id: 302, name: "Iced Tea", stock: 4 }
-      ],
-      categorySales: [
-        { product__category__name: "Burgers", total: 12500 },
-        { product__category__name: "Sides", total: 8750 },
-        { product__category__name: "Beverages", total: 5200 },
-        { product__category__name: "Desserts", total: 2300 }
-      ]
-    }
-  },
-  users: {
-    profile: {
-      id: 1,
-      name: "Admin User",
-      email: "admin@example.com",
-      phone: "555-123-4567",
-      address: "123 Main St, City"
+      }
+
+      throw new Error("Registration failed. Please try again.");
     }
   }
 };
 
-// Helper function to simulate API delay
-const mockApiCall = (data, delay = 300) => {
-  return new Promise(resolve => {
-    setTimeout(() => resolve(data), delay);
-  });
+// Login user
+export const login = async (email, password) => {
+  if (USE_MOCK_DATA) {
+    try {
+      const db = await initDb();
+
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(["users"], "readonly");
+        const store = transaction.objectStore("users");
+        const emailIndex = store.index("email");
+        const request = emailIndex.get(email);
+
+        request.onsuccess = (event) => {
+          const user = event.target.result;
+
+          if (!user) {
+            reject(new Error("Invalid credentials"));
+            return;
+          }
+
+          // Check password (in a real app, use proper password comparison)
+          if (user.password !== password) {
+            reject(new Error("Invalid credentials"));
+            return;
+          }
+
+          // Create a copy without password
+          const { password: userPassword, ...userWithoutPassword } = user;
+
+          // Add token for auth simulation
+          userWithoutPassword.token = `token-${user.id}-${Date.now()}`;
+
+          resolve(userWithoutPassword);
+        };
+
+        request.onerror = () => {
+          reject(new Error("Login failed"));
+        };
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
+  } else {
+    try {
+      // Real API call for login - using proper field names for Simple JWT
+      const response = await apiClient.post("/auth/login/", {
+        email, // Keep this as email since that's your username field
+        password,
+      });
+
+      // Store user data in localStorage for auth persistence
+      localStorage.setItem("user", JSON.stringify(response.data));
+
+      return response.data;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw new Error(
+        error.response?.data?.detail ||
+          "Login failed. Please check your credentials."
+      );
+    }
+  }
+};
+
+// Fetch all users (for admin panel)
+export const fetchUsers = async () => {
+  try {
+    const db = await initDb();
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(["users"], "readonly");
+      const store = transaction.objectStore("users");
+      const request = store.getAll();
+
+      request.onsuccess = (event) => {
+        // Remove passwords from all users
+        const users = event.target.result.map((user) => {
+          const { password, ...userWithoutPassword } = user;
+          return userWithoutPassword;
+        });
+
+        resolve(users);
+      };
+
+      request.onerror = () => {
+        reject(new Error("Failed to fetch users"));
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+};
+
+// Create/update user (for admin panel)
+export const createUser = async (userData) => {
+  try {
+    const db = await initDb();
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(["users"], "readwrite");
+      const store = transaction.objectStore("users");
+
+      if (userData.id) {
+        // Update existing user
+        const getRequest = store.get(userData.id);
+
+        getRequest.onsuccess = (event) => {
+          const existingUser = event.target.result;
+
+          if (!existingUser) {
+            reject(new Error("User not found"));
+            return;
+          }
+
+          const updatedUser = {
+            ...existingUser,
+            ...userData,
+            // Don't update password if not provided
+            password: userData.password || existingUser.password,
+          };
+
+          const updateRequest = store.put(updatedUser);
+
+          updateRequest.onsuccess = () => {
+            // Return user without password
+            const { password, ...userWithoutPassword } = updatedUser;
+            resolve(userWithoutPassword);
+          };
+
+          updateRequest.onerror = () => {
+            reject(new Error("Failed to update user"));
+          };
+        };
+
+        getRequest.onerror = () => {
+          reject(new Error("Failed to fetch user for update"));
+        };
+      } else {
+        // Create new user (use register function)
+        register(userData).then(resolve).catch(reject);
+      }
+    });
+  } catch (error) {
+    console.error("User operation error:", error);
+    throw error;
+  }
+};
+
+// Delete user (for admin panel)
+export const deleteUser = async (userId) => {
+  try {
+    const db = await initDb();
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(["users"], "readwrite");
+      const store = transaction.objectStore("users");
+      const request = store.delete(userId);
+
+      request.onsuccess = () => {
+        resolve({ success: true, message: "User deleted successfully" });
+      };
+
+      request.onerror = () => {
+        reject(new Error("Failed to delete user"));
+      };
+    });
+  } catch (error) {
+    console.error("Delete user error:", error);
+    throw error;
+  }
+};
+
+// Toggle user active status
+export const toggleUserStatus = async (userId, active) => {
+  try {
+    const db = await initDb();
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(["users"], "readwrite");
+      const store = transaction.objectStore("users");
+      const getRequest = store.get(userId);
+
+      getRequest.onsuccess = (event) => {
+        const user = event.target.result;
+
+        if (!user) {
+          reject(new Error("User not found"));
+          return;
+        }
+
+        user.active = active;
+
+        const updateRequest = store.put(user);
+
+        updateRequest.onsuccess = () => {
+          const { password, ...userWithoutPassword } = user;
+          resolve(userWithoutPassword);
+        };
+
+        updateRequest.onerror = () => {
+          reject(new Error("Failed to update user status"));
+        };
+      };
+
+      getRequest.onerror = () => {
+        reject(new Error("Failed to fetch user for status update"));
+      };
+    });
+  } catch (error) {
+    console.error("Toggle user status error:", error);
+    throw error;
+  }
 };
 
 // Dashboard
@@ -182,12 +616,70 @@ export const fetchDashboardStats = async () => {
   if (USE_MOCK_DATA) {
     return await mockApiCall(mockData.dashboard.stats);
   }
-  
+
   try {
-    const response = await apiClient.get('/dashboard/stats/');
+    const response = await apiClient.get("/dashboard/stats/");
     return response.data;
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);
+    throw error;
+  }
+};
+
+// Users
+export const fetchUser = async (id) => {
+  if (USE_MOCK_DATA) {
+    const parsedId = parseInt(id, 10);
+    if (isNaN(parsedId)) throw new Error("Invalid user ID");
+
+    const user = mockData.users.all.find((u) => u.id === parsedId);
+    if (!user) throw new Error("User not found");
+    return await mockApiCall(user);
+  }
+
+  try {
+    const response = await apiClient.get(`/admin/users/${id}/`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
+  }
+};
+
+export const updateUser = async (id, userData) => {
+  if (USE_MOCK_DATA) {
+    const index = mockData.users.all.findIndex((u) => u.id === parseInt(id));
+    if (index === -1) throw new Error("User not found");
+
+    mockData.users.all[index] = {
+      ...mockData.users.all[index],
+      ...userData,
+    };
+    return await mockApiCall(mockData.users.all[index]);
+  }
+
+  try {
+    const response = await apiClient.put(`/admin/users/${id}/`, userData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
+};
+
+export const fetchUserOrders = async (userId) => {
+  if (USE_MOCK_DATA) {
+    const userOrders = mockData.orders.filter(
+      (o) => o.customer_email === userId
+    );
+    return await mockApiCall(userOrders);
+  }
+
+  try {
+    const response = await apiClient.get(`/admin/users/${userId}/orders/`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user orders:", error);
     throw error;
   }
 };
@@ -197,9 +689,9 @@ export const fetchCategories = async () => {
   if (USE_MOCK_DATA) {
     return await mockApiCall(mockData.categories);
   }
-  
+
   try {
-    const response = await apiClient.get('/categories/');
+    const response = await apiClient.get("/admin/categories/");
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -209,33 +701,34 @@ export const fetchCategories = async () => {
 
 export const fetchCategory = async (id) => {
   if (USE_MOCK_DATA) {
-    const category = mockData.categories.find(c => c.id === parseInt(id));
-    if (!category) throw new Error('Category not found');
+    const category = mockData.categories.find((c) => c.id === parseInt(id));
+    if (!category) throw new Error("Category not found");
     return await mockApiCall(category);
   }
-  
+
   try {
-    const response = await apiClient.get(`/categories/${id}/`);
+    const response = await apiClient.get(`/admin/categories/${id}/`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching category ${id}:`, error);
+    console.error("Error fetching category:", error);
     throw error;
   }
 };
 
 export const createCategory = async (categoryData) => {
   if (USE_MOCK_DATA) {
+    const newId = Math.max(...mockData.categories.map((c) => c.id)) + 1;
     const newCategory = {
+      id: newId,
       ...categoryData,
-      id: Math.max(...mockData.categories.map(c => c.id)) + 1,
-      active: true
+      created_at: new Date().toISOString(),
     };
     mockData.categories.push(newCategory);
     return await mockApiCall(newCategory);
   }
-  
+
   try {
-    const response = await apiClient.post('/categories/', categoryData);
+    const response = await apiClient.post("/admin/categories/", categoryData);
     return response.data;
   } catch (error) {
     console.error("Error creating category:", error);
@@ -245,41 +738,86 @@ export const createCategory = async (categoryData) => {
 
 export const updateCategory = async (id, categoryData) => {
   if (USE_MOCK_DATA) {
-    const index = mockData.categories.findIndex(c => c.id === parseInt(id));
-    if (index === -1) throw new Error('Category not found');
-    
-    const updatedCategory = {
+    const index = mockData.categories.findIndex((c) => c.id === parseInt(id));
+    if (index === -1) throw new Error("Category not found");
+
+    mockData.categories[index] = {
       ...mockData.categories[index],
       ...categoryData,
-      id: parseInt(id)
+      id: parseInt(id),
     };
-    mockData.categories[index] = updatedCategory;
-    return await mockApiCall(updatedCategory);
+
+    return await mockApiCall(mockData.categories[index]);
   }
-  
+
   try {
-    const response = await apiClient.put(`/categories/${id}/`, categoryData);
+    const response = await apiClient.put(
+      `/admin/categories/${id}/`,
+      categoryData
+    );
     return response.data;
   } catch (error) {
-    console.error(`Error updating category ${id}:`, error);
+    console.error("Error updating category:", error);
     throw error;
   }
 };
 
 export const deleteCategory = async (id) => {
   if (USE_MOCK_DATA) {
-    const index = mockData.categories.findIndex(c => c.id === parseInt(id));
-    if (index === -1) throw new Error('Category not found');
-    
+    const index = mockData.categories.findIndex((c) => c.id === parseInt(id));
+    if (index === -1) throw new Error("Category not found");
+
     mockData.categories.splice(index, 1);
-    return await mockApiCall(true);
+    return await mockApiCall({ success: true });
   }
-  
+
   try {
-    await apiClient.delete(`/categories/${id}/`);
-    return true;
+    await apiClient.delete(`/admin/categories/${id}/`);
+    return { success: true };
   } catch (error) {
-    console.error(`Error deleting category ${id}:`, error);
+    console.error("Error deleting category:", error);
+    throw error;
+  }
+};
+
+// Helper function to ensure default categories exist
+export const ensureDefaultCategories = async () => {
+  try {
+    const defaultCategories = ["Burgers", "Sides", "Beverages"];
+
+    // First, fetch existing categories
+    const existingCategories = await fetchCategories();
+    const existingCategoryNames = existingCategories.map((cat) => cat.name);
+
+    // Find which default categories don't exist yet
+    const categoriesToCreate = defaultCategories.filter(
+      (name) => !existingCategoryNames.includes(name)
+    );
+
+    // Create any missing categories
+    if (categoriesToCreate.length > 0) {
+      console.log(
+        `Creating ${categoriesToCreate.length} default categories: ${categoriesToCreate.join(", ")}`
+      );
+
+      const creationPromises = categoriesToCreate.map((name) =>
+        createCategory({
+          name,
+          description: `${name} category for food items`,
+          active: true,
+        })
+      );
+
+      await Promise.all(creationPromises);
+
+      // Return the updated categories list
+      return await fetchCategories();
+    }
+
+    // If no new categories needed, return existing ones
+    return existingCategories;
+  } catch (error) {
+    console.error("Error ensuring default categories exist:", error);
     throw error;
   }
 };
@@ -287,17 +825,11 @@ export const deleteCategory = async (id) => {
 // Products
 export const fetchProducts = async () => {
   if (USE_MOCK_DATA) {
-    return await mockApiCall(mockData.products.map(product => {
-      const category = mockData.categories.find(c => c.id === product.category_id);
-      return {
-        ...product,
-        category: category ? { id: category.id, name: category.name } : null
-      };
-    }));
+    return await mockApiCall(mockData.products);
   }
-  
+
   try {
-    const response = await apiClient.get('/products/');
+    const response = await apiClient.get("/products/");
     return response.data;
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -307,47 +839,64 @@ export const fetchProducts = async () => {
 
 export const fetchProduct = async (id) => {
   if (USE_MOCK_DATA) {
-    const product = mockData.products.find(p => p.id === parseInt(id));
-    if (!product) throw new Error('Product not found');
-    
-    const category = mockData.categories.find(c => c.id === product.category_id);
-    return await mockApiCall({
-      ...product,
-      category: category ? { id: category.id, name: category.name } : null
-    });
+    const product = mockData.products.find((p) => p.id === parseInt(id));
+    if (!product) throw new Error("Product not found");
+    return await mockApiCall(product);
   }
-  
+
   try {
     const response = await apiClient.get(`/products/${id}/`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching product ${id}:`, error);
+    console.error("Error fetching product:", error);
     throw error;
   }
 };
 
 export const createProduct = async (productData) => {
   if (USE_MOCK_DATA) {
+    const newId = Math.max(...mockData.products.map((p) => p.id)) + 1;
     const newProduct = {
+      id: newId,
       ...productData,
-      id: Math.max(...mockData.products.map(p => p.id)) + 1,
-      active: true,
-      category_id: parseInt(productData.category_id)
+      created_at: new Date().toISOString(),
     };
+
+    // Handle FormData conversion for mock data
+    if (productData instanceof FormData) {
+      const formDataObj = {};
+      productData.forEach((value, key) => {
+        // For files, store a URL placeholder
+        if (value instanceof File) {
+          formDataObj[key] = "https://via.placeholder.com/300x200";
+        } else {
+          formDataObj[key] = value;
+        }
+      });
+
+      Object.assign(newProduct, formDataObj);
+    }
+
     mockData.products.push(newProduct);
     return await mockApiCall(newProduct);
   }
-  
+
   try {
-    // Use FormData for file uploads
     const formData = new FormData();
-    Object.keys(productData).forEach(key => {
-      formData.append(key, productData[key]);
+    for (const [key, value] of Object.entries(productData)) {
+      if (value instanceof File) {
+        formData.append(key, value);
+      } else {
+        formData.append(key, value);
+      }
+    }
+
+    const response = await apiClient.post("/products/", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
-    
-    const response = await apiClient.post('/products/', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+
     return response.data;
   } catch (error) {
     console.error("Error creating product:", error);
@@ -357,31 +906,41 @@ export const createProduct = async (productData) => {
 
 export const updateProduct = async (id, productData) => {
   if (USE_MOCK_DATA) {
-    const index = mockData.products.findIndex(p => p.id === parseInt(id));
-    if (index === -1) throw new Error('Product not found');
-    
-    const updatedProduct = {
-      ...mockData.products[index],
-      ...productData,
-      id: parseInt(id),
-      category_id: parseInt(productData.category_id || mockData.products[index].category_id)
-    };
+    const index = mockData.products.findIndex((p) => p.id === parseInt(id));
+    if (index === -1) throw new Error("Product not found");
+
+    const updatedProduct = { ...mockData.products[index] };
+
+    // Handle FormData conversion for mock data
+    if (productData instanceof FormData) {
+      productData.forEach((value, key) => {
+        // For files, store a URL placeholder
+        if (value instanceof File) {
+          updatedProduct[key] = "https://via.placeholder.com/300x200";
+        } else {
+          updatedProduct[key] = value;
+        }
+      });
+    } else {
+      Object.assign(updatedProduct, productData);
+    }
+
     mockData.products[index] = updatedProduct;
     return await mockApiCall(updatedProduct);
   }
-  
+
   try {
     // Use FormData for file uploads
     const formData = new FormData();
-    Object.keys(productData).forEach(key => {
+    Object.keys(productData).forEach((key) => {
       // Only append if value is not null
       if (productData[key] !== null) {
         formData.append(key, productData[key]);
       }
     });
-    
+
     const response = await apiClient.put(`/products/${id}/`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
   } catch (error) {
@@ -392,19 +951,19 @@ export const updateProduct = async (id, productData) => {
 
 export const deleteProduct = async (id) => {
   if (USE_MOCK_DATA) {
-    const index = mockData.products.findIndex(p => p.id === parseInt(id));
-    if (index === -1) throw new Error('Product not found');
-    
+    const index = mockData.products.findIndex((p) => p.id === parseInt(id));
+    if (index === -1) throw new Error("Product not found");
+
     // Store product name for logging
     const productName = mockData.products[index].name;
-    
+
     // Remove the product
     mockData.products.splice(index, 1);
-    
+
     console.log(`Product ${id} (${productName}) deleted successfully`);
     return await mockApiCall(true);
   }
-  
+
   try {
     await apiClient.delete(`/products/${id}/`);
     return true;
@@ -419,9 +978,9 @@ export const fetchOrders = async () => {
   if (USE_MOCK_DATA) {
     return await mockApiCall(mockData.orders);
   }
-  
+
   try {
-    const response = await apiClient.get('/orders/');
+    const response = await apiClient.get("/orders/");
     return response.data;
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -431,11 +990,11 @@ export const fetchOrders = async () => {
 
 export const fetchOrder = async (id) => {
   if (USE_MOCK_DATA) {
-    const order = mockData.orders.find(o => o.id === parseInt(id));
-    if (!order) throw new Error('Order not found');
+    const order = mockData.orders.find((o) => o.id === parseInt(id));
+    if (!order) throw new Error("Order not found");
     return await mockApiCall(order);
   }
-  
+
   try {
     const response = await apiClient.get(`/orders/${id}/`);
     return response.data;
@@ -447,13 +1006,13 @@ export const fetchOrder = async (id) => {
 
 export const updateOrderStatus = async (id, status) => {
   if (USE_MOCK_DATA) {
-    const index = mockData.orders.findIndex(o => o.id === parseInt(id));
-    if (index === -1) throw new Error('Order not found');
-    
+    const index = mockData.orders.findIndex((o) => o.id === parseInt(id));
+    if (index === -1) throw new Error("Order not found");
+
     mockData.orders[index].status = status;
     return await mockApiCall(mockData.orders[index]);
   }
-  
+
   try {
     const response = await apiClient.patch(`/orders/${id}/`, { status });
     return response.data;
@@ -463,79 +1022,40 @@ export const updateOrderStatus = async (id, status) => {
   }
 };
 
-// Authentication
-export const login = async (email, password) => {
-  if (USE_MOCK_DATA) {
-    // Simple mock validation
-    if (email === 'admin@example.com' && password === 'password') {
-      return await mockApiCall({
-        id: 1,
-        name: 'Admin User',
-        email: 'admin@example.com',
-        is_staff: true,
-        token: 'mock-jwt-token'
-      });
-    }
-    
-    throw new Error('Invalid credentials');
-  }
-  
-  try {
-    const response = await apiClient.post('/user/login/', { email, password });
-    return response.data;
-  } catch (error) {
-    console.error("Error during login:", error);
-    throw error;
-  }
-};
-
-export const register = async (userData) => {
-  if (USE_MOCK_DATA) {
-    // Just return success for mock
-    return await mockApiCall({ success: true });
-  }
-  
-  try {
-    const response = await apiClient.post('/user/register/', userData);
-    return response.data;
-  } catch (error) {
-    console.error("Error during registration:", error);
-    throw error;
-  }
-};
-
 // Menu API endpoints
 export const fetchMenuCategories = async () => {
   if (USE_MOCK_DATA) {
-    return await mockApiCall(mockData.categories.filter(c => c.active));
+    return await mockApiCall(mockData.categories.filter((c) => c.active));
   }
-  
+
   try {
-    const response = await apiClient.get('/menu/categories/');
+    const response = await apiClient.get("/menu/categories/");
     return response.data;
   } catch (error) {
-    console.error('Error fetching menu categories:', error);
+    console.error("Error fetching menu categories:", error);
     throw error;
   }
 };
 
 export const fetchMenuItems = async (categoryId) => {
   if (USE_MOCK_DATA) {
-    let products = mockData.products.filter(p => p.active);
-    
+    let products = mockData.products.filter((p) => p.active);
+
     if (categoryId) {
-      products = products.filter(p => p.category_id === parseInt(categoryId));
+      products = products.filter((p) => p.category_id === parseInt(categoryId));
     }
-    
+
     return await mockApiCall(products);
   }
-  
+
   try {
-    const url = categoryId ? `/menu/items/?category=${categoryId}` : '/menu/items/';
+    const url = categoryId
+      ? `/menu/items/?category=${categoryId}`
+      : "/menu/items/";
     const response = await apiClient.get(url);
     return response.data;
   } catch (error) {
-    console.error('Error fetching menu items:', error);
+    console.error("Error fetching menu items:", error);
     throw error;
   }
 };
@@ -545,9 +1065,9 @@ export const fetchUserProfile = async () => {
   if (USE_MOCK_DATA) {
     return await mockApiCall(mockData.users.profile);
   }
-  
+
   try {
-    const response = await apiClient.get('/user/profile/');
+    const response = await apiClient.get("/user/profile/");
     return response.data;
   } catch (error) {
     console.error("Error fetching user profile:", error);
@@ -559,13 +1079,13 @@ export const updateUserProfile = async (profileData) => {
   if (USE_MOCK_DATA) {
     mockData.users.profile = {
       ...mockData.users.profile,
-      ...profileData
+      ...profileData,
     };
     return await mockApiCall(mockData.users.profile);
   }
-  
+
   try {
-    const response = await apiClient.put('/user/profile/', profileData);
+    const response = await apiClient.put("/user/profile/", profileData);
     return response.data;
   } catch (error) {
     console.error("Error updating user profile:", error);
@@ -577,17 +1097,17 @@ export const updateUserProfile = async (profileData) => {
 export const createOrder = async (orderData) => {
   if (USE_MOCK_DATA) {
     const newOrder = {
-      id: Math.max(...mockData.orders.map(o => o.id)) + 1,
+      id: Math.max(...mockData.orders.map((o) => o.id)) + 1,
       ...orderData,
-      status: 'pending',
-      order_date: new Date().toISOString()
+      status: "pending",
+      order_date: new Date().toISOString(),
     };
     mockData.orders.push(newOrder);
     return await mockApiCall(newOrder);
   }
-  
+
   try {
-    const response = await apiClient.post('/orders/', orderData);
+    const response = await apiClient.post("/orders/", orderData);
     return response.data;
   } catch (error) {
     console.error("Error creating order:", error);
@@ -595,186 +1115,84 @@ export const createOrder = async (orderData) => {
   }
 };
 
-// Polling Configuration
-const pollingConfig = {
-  dashboard: {
-    enabled: true,
-    interval: 10000, // 10 seconds
-    listeners: []
-  },
-  products: {
-    enabled: true,
-    interval: 15000, // 15 seconds
-    listeners: []
-  },
-  categories: {
-    enabled: true,
-    interval: 30000, // 30 seconds
-    listeners: []
-  },
-  orders: {
-    enabled: true,
-    interval: 8000, // 8 seconds
-    listeners: []
-  }
-};
-
-// Start polling for a resource
-export const startPolling = (resource, callback) => {
-  if (!pollingConfig[resource]) {
-    console.error(`No polling configuration for resource: ${resource}`);
-    return () => {};
-  }
-  
-  // Add listener
-  const listenerId = Date.now() + Math.random();
-  pollingConfig[resource].listeners.push({
-    id: listenerId,
-    callback
-  });
-  
-  // Start polling if not already started and enabled
-  if (pollingConfig[resource].enabled && !pollingConfig[resource].intervalId) {
-    const fetchFunction = getFetchFunctionForResource(resource);
-    
-    // Immediate first fetch
-    fetchFunction().then(data => {
-      pollingConfig[resource].lastData = data;
-      notifyListeners(resource, data);
-    });
-    
-    // Set up interval
-    pollingConfig[resource].intervalId = setInterval(() => {
-      fetchFunction().then(data => {
-        // Check if data has changed
-        const hasChanged = JSON.stringify(data) !== JSON.stringify(pollingConfig[resource].lastData);
-        pollingConfig[resource].lastData = data;
-        
-        if (hasChanged) {
-          notifyListeners(resource, data);
-        }
-      });
-    }, pollingConfig[resource].interval);
-  }
-  
-  // Return unsubscribe function
-  return () => {
-    pollingConfig[resource].listeners = pollingConfig[resource].listeners.filter(
-      listener => listener.id !== listenerId
-    );
-    
-    // Stop polling if no more listeners
-    if (pollingConfig[resource].listeners.length === 0 && pollingConfig[resource].intervalId) {
-      clearInterval(pollingConfig[resource].intervalId);
-      pollingConfig[resource].intervalId = null;
-    }
-  };
-};
-
-// Helper to notify all listeners for a resource
-const notifyListeners = (resource, data) => {
-  pollingConfig[resource].listeners.forEach(listener => {
-    listener.callback(data);
-  });
-};
-
-// Get the appropriate fetch function for a resource
-const getFetchFunctionForResource = (resource) => {
-  switch (resource) {
-    case 'dashboard':
-      return fetchDashboardStats;
-    case 'products':
-      return fetchProducts;
-    case 'categories':
-      return fetchCategories;
-    case 'orders':
-      return fetchOrders;
-    default:
-      return () => Promise.resolve([]);
-  }
-};
-
-// For simulating real-time updates in mock data mode
-export const simulateDataChanges = () => {
-  if (!USE_MOCK_DATA) return;
-  
-  // Set up random updates to mock data
-  setInterval(() => {
-    // Randomly update order statuses
-    if (mockData.orders.length > 0) {
-      const randomOrderIndex = Math.floor(Math.random() * mockData.orders.length);
-      const statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
-      const newStatus = statuses[Math.floor(Math.random() * statuses.length)];
-      
-      mockData.orders[randomOrderIndex].status = newStatus;
-      console.log(`Real-time update: Order #${mockData.orders[randomOrderIndex].id} status changed to ${newStatus}`);
-      
-      // Notify orders listeners if any
-      if (pollingConfig.orders.listeners.length > 0) {
-        fetchOrders().then(data => {
-          notifyListeners('orders', data);
-        });
+// Token refresh functionality
+export const refreshToken = async () => {
+  try {
+    if (USE_MOCK_DATA) {
+      // Mock token refresh logic (kept for reference)
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (!user.token) {
+        throw new Error("No valid session");
       }
-    }
-    
-    // Randomly update dashboard stats
-    mockData.dashboard.stats.totalOrders = mockData.dashboard.stats.totalOrders + Math.floor(Math.random() * 3);
-    
-    // 10% chance to add a new order
-    if (Math.random() < 0.1) {
-      const newOrderId = Math.max(...mockData.orders.map(o => o.id)) + 1;
-      const randomProduct = mockData.products[Math.floor(Math.random() * mockData.products.length)];
-      
-      const newOrder = {
-        id: newOrderId,
-        customer_name: `New Customer ${newOrderId}`,
-        customer_email: `customer${newOrderId}@example.com`,
-        contact_number: "555-123-4567",
-        shipping_address: "789 New St, City",
-        order_date: new Date().toISOString(),
-        status: 'pending',
-        total_amount: randomProduct.price,
-        items: [
-          { 
-            id: 1, 
-            product_id: randomProduct.id, 
-            product_name: randomProduct.name, 
-            quantity: 1, 
-            price: randomProduct.price 
-          }
-        ]
+      const newToken = `refresh-token-${user.id}-${Date.now()}`;
+      const refreshedUser = {
+        ...user,
+        token: newToken,
       };
-      
-      mockData.orders.push(newOrder);
-      console.log(`Real-time update: New order #${newOrderId} received`);
-      
-      mockData.dashboard.stats.recentOrders.unshift({
-        id: newOrderId,
-        customer_name: newOrder.customer_name,
-        total_amount: newOrder.total_amount,
-        status: 'pending',
-        order_date: newOrder.order_date
-      });
-      
-      mockData.dashboard.stats.recentOrders = mockData.dashboard.stats.recentOrders.slice(0, 5);
-      
-      if (pollingConfig.dashboard.listeners.length > 0) {
-        fetchDashboardStats().then(data => {
-          notifyListeners('dashboard', data);
-        });
-      }
-      
-      if (pollingConfig.orders.listeners.length > 0) {
-        fetchOrders().then(data => {
-          notifyListeners('orders', data);
-        });
-      }
+      localStorage.setItem("user", JSON.stringify(refreshedUser));
+      return refreshedUser;
     }
-  }, 15000); 
+
+    // Get the current user from localStorage
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    if (!user.token) {
+      throw new Error("No valid session");
+    }
+
+    // Real API call for token refresh
+    const response = await apiClient.post("/auth/refresh-token/", {
+      token: user.token,
+    });
+
+    // Update user object with new token
+    const refreshedUser = {
+      ...user,
+      token: response.data.token,
+    };
+
+    // Update localStorage
+    localStorage.setItem("user", JSON.stringify(refreshedUser));
+
+    return refreshedUser;
+  } catch (error) {
+    console.error("Token refresh error:", error);
+    // Clear user data if refresh fails
+    localStorage.removeItem("user");
+    throw error;
+  }
 };
 
-if (USE_MOCK_DATA) {
-  simulateDataChanges();
-}
-
-export default apiClient;
+export default {
+  login,
+  register,
+  fetchUsers,
+  fetchUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  // Additional API functions
+  refreshToken,
+  toggleUserStatus,
+  fetchDashboardStats,
+  fetchUserOrders,
+  fetchCategories,
+  fetchCategory,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  ensureDefaultCategories,
+  fetchProducts,
+  fetchProduct,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  fetchOrders,
+  fetchOrder,
+  updateOrderStatus,
+  fetchMenuCategories,
+  fetchMenuItems,
+  fetchUserProfile,
+  updateUserProfile,
+  createOrder,
+};

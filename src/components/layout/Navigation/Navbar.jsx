@@ -184,7 +184,11 @@ export default function NavigationBar() {
                     >
                       <i className="bi bi-person-circle fs-5"></i>
                       <span className="ms-1 d-none d-md-inline">
-                        {user?.name || "Account"}
+                        {user?.displayName ||
+                          user?.first_name ||
+                          user?.username ||
+                          user?.email?.split("@")[0] ||
+                          "User"}
                       </span>
                     </div>
                   }
