@@ -9,6 +9,7 @@ import {
   FaSignOutAlt,
   FaStore,
   FaUsers,
+  FaToolbox,
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import "../../styles/Sidebar.css";
@@ -66,6 +67,16 @@ const Sidebar = () => {
           className={isActive("/users") ? "active" : ""}
         >
           <FaUsers className="me-2" /> Users
+        </Nav.Link>
+
+        {/* Django Admin External Link */}
+        <Nav.Link
+          href="http://localhost:8000/admin/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="django-admin-link"
+        >
+          <FaToolbox className="me-2" /> Django Admin
         </Nav.Link>
       </Nav>
 

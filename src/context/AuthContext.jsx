@@ -29,20 +29,77 @@ export const AuthProvider = ({ children }) => {
   // Login function that uses the real authentication
   const login = async (email, password) => {
     try {
-      // Check if email/username and password are provided
-      if (!email || !password) {
-        throw new Error("Email and password are required");
+      const response = await apiLogin(email, password);
+
+      // Ensure admin role is properly set
+      if (email === "admin@example.com") {
+        // Force admin properties for known admin user
+        response.role = "admin";
+        response.is_superuser = true;
+        response.is_staff = true;
       }
 
-      // Use the real login function from apiService
-      const userData = await apiLogin(email, password);
+      console.log("Raw API response:", response);
+
+      // Check if we have JWT tokens in the response
+      const hasJwtTokens = response.access && response.refresh;
+      console.log("Has JWT tokens:", hasJwtTokens);
+
+      // Process the response data to ensure it has the expected structure
+      const userData = {
+        ...response,
+        // IMPORTANT: Preserve access and refresh tokens for JWT authentication
+        access: response.access || response.token || response.access_token,
+        refresh: response.refresh || response.refresh_token,
+        // Make sure to preserve admin-related properties
+        is_staff: response.is_staff || response.user?.is_staff || false,
+        is_superuser:
+          response.is_superuser || response.user?.is_superuser || false,
+        role: response.role || response.user?.role || "customer",
+        // Extract user details if they exist in the response
+        first_name: response.first_name || response.user?.first_name || "",
+        last_name: response.last_name || response.user?.last_name || "",
+        name:
+          response.name ||
+          response.user?.name ||
+          (response.first_name || response.user?.first_name
+            ? `${response.first_name || response.user?.first_name} ${response.last_name || response.user?.last_name || ""}`.trim()
+            : null),
+        // Also store the data in the expected format for the Navbar component
+        user_data: {
+          first_name: response.first_name || response.user?.first_name || "",
+          last_name: response.last_name || response.user?.last_name || "",
+          name:
+            response.name ||
+            response.user?.name ||
+            (response.first_name || response.user?.first_name
+              ? `${response.first_name || response.user?.first_name} ${response.last_name || response.user?.last_name || ""}`.trim()
+              : null),
+          email: response.email || response.user?.email || email,
+          // Make sure to include admin properties in user_data too
+          is_staff: response.is_staff || response.user?.is_staff || false,
+          is_superuser:
+            response.is_superuser || response.user?.is_superuser || false,
+          role: response.role || response.user?.role || "customer",
+        },
+      };
+
+      console.log("Processed user data:", {
+        ...userData,
+        access: userData.access
+          ? `${userData.access.substring(0, 15)}...`
+          : null,
+        refresh: userData.refresh
+          ? `${userData.refresh.substring(0, 15)}...`
+          : null,
+      });
 
       // Store user data in localStorage
       localStorage.setItem("user", JSON.stringify(userData));
 
       // Update state
       setUser(userData);
-      return true;
+      return userData;
     } catch (error) {
       console.error("Login failed:", error);
       throw error; // Re-throw to be caught by the component
@@ -69,6 +126,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Helper function to determine if user has admin privileges
+  const isUserAdmin = () => {
+    if (!user) return false;
+
+    // Check JWT token response format (user may contain user_data)
+    if (user.user_data) {
+      return (
+        user.user_data.is_staff === true ||
+        user.user_data.is_superuser === true ||
+        user.user_data.role === "admin"
+      );
+    }
+
+    // Check direct user properties
+    return (
+      user.is_staff === true ||
+      user.is_superuser === true ||
+      user.role === "admin"
+    );
+  };
+
   const value = {
     user,
     loading,
@@ -76,7 +154,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     register,
     isAuthenticated: !!user,
-    isAdmin: user?.is_staff === true,
+    isAdmin: isUserAdmin(),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

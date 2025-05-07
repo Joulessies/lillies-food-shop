@@ -24,11 +24,15 @@
   object-fit: cover;
   border-radius: 4px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 50px !important;
+  height: 50px !important;
+  max-width: 50px !important;
+  max-height: 50px !important;
 }
 
 .no-image-placeholder {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;

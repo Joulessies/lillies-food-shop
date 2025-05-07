@@ -15,7 +15,8 @@ import { register } from "../../services/apiService";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    first_name: "",
+    last_name: "",
     email: "",
     phone: "",
     password: "",
@@ -66,7 +67,9 @@ const SignupPage = () => {
       const userData = {
         email: formData.email,
         password: formData.password,
-        name: formData.name,
+        name: `${formData.first_name} ${formData.last_name}`.trim(),
+        first_name: formData.first_name,
+        last_name: formData.last_name,
         phone: formData.phone || "",
       };
 
@@ -113,16 +116,38 @@ const SignupPage = () => {
                 {error && <Alert variant="danger">{error}</Alert>}
 
                 <Form onSubmit={handleSubmit}>
-                  <Form.Group controlId="formBasicName" className="mb-3">
-                    <Form.Label>Full Name</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                    />
-                  </Form.Group>
+                  <Row>
+                    <Col md={6}>
+                      <Form.Group
+                        controlId="formBasicFirst_name"
+                        className="mb-3"
+                      >
+                        <Form.Label>First Name</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="First name"
+                          value={formData.first_name}
+                          onChange={handleChange}
+                          required
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                      <Form.Group
+                        controlId="formBasicLast_name"
+                        className="mb-3"
+                      >
+                        <Form.Label>Last Name</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Last name"
+                          value={formData.last_name}
+                          onChange={handleChange}
+                          required
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
 
                   <Form.Group controlId="formBasicEmail" className="mb-3">
                     <Form.Label>Email address</Form.Label>

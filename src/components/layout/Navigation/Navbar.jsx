@@ -85,6 +85,50 @@ export default function NavigationBar() {
     e.target.src = "https://via.placeholder.com/80x80?text=Food";
   };
 
+  // Helper function to get user's display name
+  const getUserDisplayName = () => {
+    if (!user) return "User";
+
+    console.log("User object in navbar:", user);
+
+    // If user has user_data (nested format from JWT token)
+    if (user.user_data) {
+      if (user.user_data.name) return user.user_data.name;
+      if (user.user_data.first_name) {
+        return (
+          user.user_data.first_name +
+          (user.user_data.last_name ? " " + user.user_data.last_name : "")
+        );
+      }
+      // Email fallback with username extraction (before the @ symbol)
+      return user.user_data.email ? user.user_data.email.split("@")[0] : "User";
+    }
+
+    // Direct properties (non-nested format)
+    if (user.name) return user.name;
+    if (user.first_name) {
+      return user.first_name + (user.last_name ? " " + user.last_name : "");
+    }
+
+    // If we have a user object with email, extract the username part
+    if (user.email) return user.email.split("@")[0];
+
+    // If user data exists in a user property (another possible nesting)
+    if (user.user) {
+      if (user.user.name) return user.user.name;
+      if (user.user.first_name) {
+        return (
+          user.user.first_name +
+          (user.user.last_name ? " " + user.user.last_name : "")
+        );
+      }
+      return user.user.email ? user.user.email.split("@")[0] : "User";
+    }
+
+    // Ultimate fallback
+    return "User";
+  };
+
   return (
     <>
       <Navbar
@@ -184,11 +228,7 @@ export default function NavigationBar() {
                     >
                       <i className="bi bi-person-circle fs-5"></i>
                       <span className="ms-1 d-none d-md-inline">
-                        {user?.displayName ||
-                          user?.first_name ||
-                          user?.username ||
-                          user?.email?.split("@")[0] ||
-                          "User"}
+                        {getUserDisplayName()}
                       </span>
                     </div>
                   }

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Spinner, Alert } from "react-bootstrap";
+import { Table, Button, Spinner, Alert, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FaEdit, FaTrash } from "react-icons/fa";
-// import { fetchCategories, deleteCategory } from '../../services/apiService';
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import { fetchCategories } from "../../../services/apiService";
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
@@ -11,6 +11,7 @@ const CategoryList = () => {
   const [error, setError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
     loadCategories();
@@ -19,57 +20,9 @@ const CategoryList = () => {
   const loadCategories = async () => {
     try {
       setLoading(true);
-
-      // Mock data instead of API call
-      const mockCategories = [
-        {
-          id: 1,
-          name: "Burgers",
-          description: "Delicious hamburgers and cheeseburgers",
-          active: true,
-        },
-        {
-          id: 2,
-          name: "Sides",
-          description: "French fries, onion rings and more",
-          active: true,
-        },
-        {
-          id: 3,
-          name: "Beverages",
-          description: "Soft drinks, shakes, and coffee",
-          active: true,
-        },
-        {
-          id: 4,
-          name: "Desserts",
-          description: "Sweet treats to finish your meal",
-          active: true,
-        },
-        {
-          id: 5,
-          name: "Combos",
-          description: "Value meals with burger, sides and drink",
-          active: true,
-        },
-        {
-          id: 6,
-          name: "Kids Meals",
-          description: "Smaller portions with a toy",
-          active: false,
-        },
-      ];
-
-      // Simulate API delay
-      setTimeout(() => {
-        setCategories(mockCategories);
-        setLoading(false);
-      }, 500);
-
-      /* UNCOMMENT WHEN YOUR BACKEND IS READY
       const response = await fetchCategories();
       setCategories(response);
-      */
+      setLoading(false);
     } catch (err) {
       console.error("Error loading categories:", err);
       setError("Failed to load categories. Please try again later.");
@@ -89,19 +42,11 @@ const CategoryList = () => {
 
   const handleDeleteCategory = async () => {
     if (!categoryToDelete) return;
-
     try {
-      // Mock deletion
       setCategories((prevCategories) =>
         prevCategories.filter((cat) => cat.id !== categoryToDelete.id)
       );
-
-      /* UNCOMMENT WHEN YOUR BACKEND IS READY
-      await deleteCategory(categoryToDelete.id);
-      */
-
       handleCloseDeleteModal();
-      // Show success message
     } catch (err) {
       console.error("Error deleting category:", err);
       setError("Failed to delete category. Please try again later.");
@@ -126,50 +71,88 @@ const CategoryList = () => {
       {categories.length === 0 ? (
         <p className="text-center">No categories found.</p>
       ) : (
-        <Table striped bordered hover responsive>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((category) => (
-              <tr key={category.id}>
-                <td>{category.id}</td>
-                <td>{category.name}</td>
-                <td>{category.description}</td>
-                <td>
-                  <span
-                    className={`badge ${category.active ? "bg-success" : "bg-secondary"}`}
-                  >
-                    {category.active ? "Active" : "Inactive"}
-                  </span>
-                </td>
-                <td>
-                  <div className="btn-group">
-                    <Link
-                      to={`/admin/categories/edit/${category.id}`}
-                      className="btn btn-sm btn-outline-primary me-2"
-                    >
-                      <FaEdit /> Edit
-                    </Link>
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      onClick={() => handleShowDeleteModal(category)}
-                    >
-                      <FaTrash /> Delete
-                    </Button>
+        <div>
+          {categories
+            .filter((category) =>
+              ["Burgers", "Sides", "Beverages"].includes(category.name)
+            )
+            .map((category) => (
+              <Card key={category.id} className="mb-4">
+                <Card.Body>
+                  <div className="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                      <h4 className="mb-0">{category.name}</h4>
+                      <div className="text-muted">{category.description}</div>
+                      <span
+                        className={`badge ${category.active ? "bg-success" : "bg-secondary"}`}
+                      >
+                        {category.active ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+                    <div className="btn-group">
+                      <Link
+                        to={`/admin/categories/edit/${category.id}`}
+                        className="btn btn-sm btn-outline-primary me-2"
+                      >
+                        <FaEdit /> Edit
+                      </Link>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleShowDeleteModal(category)}
+                      >
+                        <FaTrash /> Delete
+                      </Button>
+                    </div>
                   </div>
-                </td>
-              </tr>
+                  <div>
+                    <strong>Products:</strong>
+                    {category.products && category.products.length > 0 ? (
+                      <div className="table-responsive mt-2">
+                        <table className="table table-sm table-bordered">
+                          <thead>
+                            <tr>
+                              <th>Product Name</th>
+                              <th>Price</th>
+                              <th>Category</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {category.products.map((product) => (
+                              <tr key={product.id}>
+                                <td>{product.name}</td>
+                                <td>₱{product.price}</td>
+                                <td>{product.category_name}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <div className="mt-2">
+                          <Link
+                            to={`/admin/products/new?category=${category.id}`}
+                            className="btn btn-sm btn-success"
+                          >
+                            + Add Product to {category.name}
+                          </Link>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-muted mt-2">
+                        No products in this category.
+                        <br />
+                        <Link
+                          to={`/admin/products/new?category=${category.id}`}
+                          className="btn btn-sm btn-success mt-2"
+                        >
+                          + Add Product to {category.name}
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </Card.Body>
+              </Card>
             ))}
-          </tbody>
-        </Table>
+        </div>
       )}
 
       <DeleteConfirmationModal

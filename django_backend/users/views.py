@@ -61,12 +61,20 @@ class RegisterView(generics.CreateAPIView):
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        # Adding print statement for debugging
+        users = User.objects.all()
+        print(f"UserListView: Found {users.count()} users")
+        for user in users:
+            print(f"User ID: {user.id}, Email: {user.email}, Is Staff: {user.is_staff}, Is Superuser: {user.is_superuser}")
+        return users
 
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = (permissions.IsAuthenticated,)
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)

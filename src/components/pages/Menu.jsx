@@ -9,11 +9,16 @@ import {
   Form,
   Alert,
   Nav,
-  Spinner
+  Spinner,
 } from "react-bootstrap";
 import "../../styles/Menu.css";
 import { useCart } from "../../context/CartContext";
 import { fetchMenuCategories, fetchMenuItems } from "../../services/apiService";
+// Import fallback images
+import burgerFallback from "../../assets/images/Burgers/classic.avif";
+import friesFallback from "../../assets/images/Fries/goldenfries.webp";
+import beverageFallback from "../../assets/images/Beverages/lemonade.avif";
+import defaultFallback from "../../assets/images/burgerfries.jpg";
 
 const Menu = () => {
   const [show, setShow] = useState(false);
@@ -25,11 +30,111 @@ const Menu = () => {
   const [error, setError] = useState(null);
   const [menuItems, setMenuItems] = useState([]);
   const audioRef = useRef(null);
-  
+  const [preloadedImages, setPreloadedImages] = useState({});
+
   // Create refs for each category section
   const categoryRefs = useRef({});
 
   const { addToCart } = useCart();
+
+  // Create a function to properly handle image URLs
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) {
+      return null; // We'll handle fallbacks separately
+    }
+
+    // Handle relative paths from backend
+    let path = imagePath;
+
+    // If it's already a full URL, return it
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+      return path;
+    }
+
+    // If the image filename has an extension, it's probably a proper image path
+    const hasImageExtension = /\.(jpg|jpeg|png|gif|webp|avif|svg)$/i.test(path);
+
+    // If no extension or just a simple name, it's likely a server image needs assembly
+    if (!hasImageExtension || !path.includes("/")) {
+      // For local development
+      if (path.startsWith("products/")) {
+        path = `media/${path}`;
+      } else if (!path.includes("media/")) {
+        path = `media/products/${path}`;
+      }
+    }
+
+    // Construct full URL to the backend image with proper error handling
+    try {
+      const fullUrl = `http://localhost:8000/${path}`;
+      return fullUrl;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  // Get category-specific fallback image
+  const getCategoryFallbackImage = (item) => {
+    if (!item) return defaultFallback;
+
+    const categoryName = menuItems
+      .find((cat) => cat.items.some((i) => i.id === item.id))
+      ?.category.toLowerCase();
+
+    if (categoryName?.includes("burger")) return burgerFallback;
+    if (categoryName?.includes("fries") || categoryName?.includes("sides"))
+      return friesFallback;
+    if (categoryName?.includes("beverage") || categoryName?.includes("drink"))
+      return beverageFallback;
+    return defaultFallback;
+  };
+
+  // Modify the image URL logic to check preloaded cache
+  const getItemImageUrl = (item) => {
+    // First check if we have a preloaded result
+    if (item && item.id && preloadedImages[item.id] !== undefined) {
+      return preloadedImages[item.id] || getCategoryFallbackImage(item);
+    }
+
+    // Otherwise use the normal getImageUrl
+    const imageUrl = getImageUrl(item?.image);
+    return imageUrl || getCategoryFallbackImage(item);
+  };
+
+  // Preload images function to check if images exist
+  const preloadImages = async (items) => {
+    const imageCache = {};
+
+    if (!items || items.length === 0) return;
+
+    // Flatten all items from all categories
+    const allItems = items.reduce((acc, category) => {
+      return [...acc, ...(category.items || [])];
+    }, []);
+
+    // For each item, try to load its image
+    for (const item of allItems) {
+      if (!item.image) continue;
+
+      const imgUrl = getImageUrl(item.image);
+      if (!imgUrl) continue;
+
+      try {
+        const result = await new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve({ success: true, url: imgUrl });
+          img.onerror = () => resolve({ success: false });
+          img.src = imgUrl;
+        });
+
+        imageCache[item.id] = result.success ? imgUrl : null;
+      } catch (error) {
+        imageCache[item.id] = null;
+      }
+    }
+
+    setPreloadedImages(imageCache);
+  };
 
   // Initialize audio
   useEffect(() => {
@@ -39,7 +144,7 @@ const Menu = () => {
 
       // Handle audio loading
       const handleLoadError = () => {
-        console.warn("Audio failed to load");
+        // Audio failed to load - silently handle
       };
 
       audioRef.current.addEventListener("error", handleLoadError);
@@ -53,7 +158,7 @@ const Menu = () => {
         }
       };
     } catch (error) {
-      console.warn("Audio initialization failed:", error);
+      // Audio initialization failed - silently handle
     }
   }, []);
 
@@ -62,46 +167,48 @@ const Menu = () => {
     const loadMenuData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch categories
         const categories = await fetchMenuCategories();
-        
+
         if (categories && categories.length > 0) {
           // Set first category as active by default
           setActiveCategory(categories[0].name);
-          
+
           // Fetch menu items for all categories
           const items = await fetchMenuItems();
-          
+
           // Organize items by category
-          const organizedItems = categories.map(category => {
+          const organizedItems = categories.map((category) => {
             return {
               id: category.id,
               category: category.name,
-              items: items.filter(item => item.category_id === category.id)
+              items: items.filter((item) => item.category === category.id),
             };
           });
-          
+
           setMenuItems(organizedItems);
+
+          // Preload images after setting menu items
+          await preloadImages(organizedItems);
         }
-        
+
         setError(null);
       } catch (err) {
-        console.error("Failed to load menu data:", err);
         setError("Failed to load menu. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
-    
+
     loadMenuData();
   }, []);
-  
+
   // Handle scroll to track active category
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 150;
-      
+
       // Find which section is currently in view
       for (const category of menuItems) {
         const element = categoryRefs.current[category.category];
@@ -117,10 +224,10 @@ const Menu = () => {
         }
       }
     };
-    
-    window.addEventListener('scroll', handleScroll);
+
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [menuItems]);
 
@@ -129,8 +236,9 @@ const Menu = () => {
     const element = categoryRefs.current[categoryName];
     if (element) {
       const yOffset = -100; // Adjust based on your navbar height
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
       setActiveCategory(categoryName);
     }
   };
@@ -156,13 +264,13 @@ const Menu = () => {
         audioRef.current.currentTime = 0;
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
-          playPromise.catch((error) => {
-            console.warn("Audio playback failed:", error);
+          playPromise.catch(() => {
+            // Audio playback failed - silently handle
           });
         }
       }
     } catch (error) {
-      console.warn("Error with audio:", error);
+      // Audio error - silently handle
     }
     setShowAlert(true);
     setTimeout(() => setShowAlert(false), 3000);
@@ -188,7 +296,10 @@ const Menu = () => {
         <Alert variant="danger">
           <Alert.Heading>Error Loading Menu</Alert.Heading>
           <p>{error}</p>
-          <Button variant="outline-danger" onClick={() => window.location.reload()}>
+          <Button
+            variant="outline-danger"
+            onClick={() => window.location.reload()}
+          >
             Retry
           </Button>
         </Alert>
@@ -215,8 +326,8 @@ const Menu = () => {
         <Nav className="justify-content-center category-navigation">
           {menuItems.map((category) => (
             <Nav.Item key={category.id}>
-              <Nav.Link 
-                className={activeCategory === category.category ? 'active' : ''}
+              <Nav.Link
+                className={activeCategory === category.category ? "active" : ""}
                 onClick={() => scrollToCategory(category.category)}
               >
                 {category.category}
@@ -227,10 +338,10 @@ const Menu = () => {
       </div>
 
       {menuItems.map((category) => (
-        <div 
-          key={category.id} 
+        <div
+          key={category.id}
           className="menu-category mb-5"
-          id={category.category.toLowerCase().replace(/\s+/g, '-')}
+          id={category.category.toLowerCase().replace(/\s+/g, "-")}
           ref={(el) => (categoryRefs.current[category.category] = el)}
         >
           <h2 className="category-title mb-4">{category.category}</h2>
@@ -241,12 +352,18 @@ const Menu = () => {
                   className="menu-item-card h-100"
                   onClick={() => handleShow(item)}
                 >
-                  <Card.Img variant="top" src={item.image} alt={item.name} />
+                  <Card.Img
+                    variant="top"
+                    src={getItemImageUrl(item)}
+                    alt={item.name}
+                    className="menu-image"
+                    style={{ height: "160px", objectFit: "cover" }}
+                  />
                   <Card.Body>
                     <div className="d-flex justify-content-between align-items-start">
                       <Card.Title>{item.name}</Card.Title>
                       <span className="menu-price">
-                        ₱{item.price.toFixed(2)}
+                        ₱{parseFloat(item.price || 0).toFixed(2)}
                       </span>
                     </div>
                     <Card.Text>{item.description}</Card.Text>
@@ -269,14 +386,15 @@ const Menu = () => {
               <Row>
                 <Col md={6}>
                   <img
-                    src={selectedItem.image}
+                    src={getItemImageUrl(selectedItem)}
                     alt={selectedItem.name}
                     className="img-fluid modal-item-image"
+                    style={{ height: "220px", objectFit: "cover" }}
                   />
                 </Col>
                 <Col md={6}>
                   <h3 className="modal-item-price">
-                    ₱ {selectedItem.price.toFixed(2)}
+                    ₱ {parseFloat(selectedItem.price || 0).toFixed(2)}
                   </h3>
                   <p className="modal-item-description">
                     {selectedItem.description}
@@ -304,7 +422,10 @@ const Menu = () => {
 
                     <div className="mt-4">
                       <h4 className="total-price">
-                        Total: ₱{(selectedItem.price * quantity).toFixed(2)}
+                        Total: ₱
+                        {(
+                          parseFloat(selectedItem.price || 0) * quantity
+                        ).toFixed(2)}
                       </h4>
                     </div>
                   </Form>

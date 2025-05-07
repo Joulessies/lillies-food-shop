@@ -12,7 +12,7 @@ User = get_user_model()
 
 # Admin email to reset
 admin_email = 'admin@lilliesfood.com'
-new_password = 'NewAdminPass123!'
+new_password = 'NewAdminPass123'
 
 try:
     # Get the admin user

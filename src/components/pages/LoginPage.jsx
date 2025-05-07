@@ -87,17 +87,16 @@ const LoginPage = () => {
 
                 {/* Admin credentials info */}
                 <Alert variant="info" className="mb-3">
-                  <strong>Demo Access:</strong>
+                  <strong>Demo Access Credentials:</strong>
                   <ul className="mb-0 mt-1">
                     <li>
-                      Admin: <code>admin@example.com</code> /{" "}
-                      <code>password</code>
-                    </li>
-                    <li>
-                      User: <code>user@example.com</code> /{" "}
-                      <code>password</code>
+                      <strong>Admin:</strong> <code>admin@example.com</code> /{" "}
+                      <code>lilliesadmin</code>
                     </li>
                   </ul>
+                  <small className="d-block mt-1 text-muted">
+                    For testing purposes only
+                  </small>
                 </Alert>
 
                 <Form onSubmit={handleSubmit}>

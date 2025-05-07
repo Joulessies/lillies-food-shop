@@ -7,7 +7,6 @@ import {
   Spinner,
   OverlayTrigger,
   Tooltip,
-  Dropdown,
 } from "react-bootstrap";
 import {
   Routes,
@@ -16,7 +15,7 @@ import {
   useNavigate,
   useLocation,
 } from "react-router-dom";
-import { FaPlus, FaTags, FaBox, FaCaretDown } from "react-icons/fa";
+import { FaBox } from "react-icons/fa";
 import Sidebar from "./Sidebar";
 import DashboardHome from "./DashboardHome";
 import CategoryList from "./categories/CategoryList";
@@ -33,7 +32,6 @@ import "../../styles/Dashboard.css";
 
 const Dashboard = () => {
   const [addingProduct, setAddingProduct] = useState(false);
-  const [addingCategory, setAddingCategory] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -50,38 +48,11 @@ const Dashboard = () => {
     location.pathname === "/admin/" ||
     location.pathname.includes("/products");
 
-  // Only show the category button in category section and home
-  const showCategoryButton =
-    location.pathname === "/admin" ||
-    location.pathname === "/admin/" ||
-    location.pathname.includes("/categories");
-
   const handleAddNewProduct = () => {
     setAddingProduct(true);
     setTimeout(() => {
       navigate("/admin/products/new", {
         state: { refresh: true },
-      });
-    }, 300);
-  };
-
-  const handleAddNewCategory = () => {
-    setAddingCategory(true);
-    setTimeout(() => {
-      navigate("/admin/categories/new", {
-        state: { refresh: true },
-      });
-    }, 300);
-  };
-
-  const handleAddPredefinedCategory = (categoryName) => {
-    setAddingCategory(true);
-    setTimeout(() => {
-      navigate("/admin/categories/new", {
-        state: {
-          refresh: true,
-          predefinedName: categoryName,
-        },
       });
     }, 300);
   };
@@ -140,56 +111,6 @@ const Dashboard = () => {
                       </span>
                     </Button>
                   </OverlayTrigger>
-                </div>
-              )}
-
-              {/* Add Category Dropdown */}
-              {showCategoryButton && (
-                <div className="floating-action-container">
-                  <Dropdown>
-                    <OverlayTrigger
-                      placement="left"
-                      overlay={<Tooltip>Add a new category</Tooltip>}
-                    >
-                      <Dropdown.Toggle
-                        variant="success"
-                        disabled={addingCategory}
-                        className="floating-action-button"
-                        id="dropdown-categories"
-                      >
-                        {addingCategory ? (
-                          <Spinner animation="border" size="sm" />
-                        ) : (
-                          <FaTags />
-                        )}
-                        <span className="floating-button-text">
-                          Add Category
-                        </span>
-                      </Dropdown.Toggle>
-                    </OverlayTrigger>
-
-                    <Dropdown.Menu align="end">
-                      <Dropdown.Item
-                        onClick={() => handleAddPredefinedCategory("Burgers")}
-                      >
-                        Burgers
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        onClick={() => handleAddPredefinedCategory("Sides")}
-                      >
-                        Sides
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        onClick={() => handleAddPredefinedCategory("Beverages")}
-                      >
-                        Beverages
-                      </Dropdown.Item>
-                      <Dropdown.Divider />
-                      <Dropdown.Item onClick={handleAddNewCategory}>
-                        Custom Category
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
                 </div>
               )}
             </div>

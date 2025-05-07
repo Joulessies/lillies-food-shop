@@ -9,7 +9,7 @@ import {
   Alert,
   Image,
 } from "react-bootstrap";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { FaSave, FaArrowLeft } from "react-icons/fa";
 import {
   fetchProduct,
@@ -17,6 +17,7 @@ import {
   updateProduct,
   fetchCategories,
   createCategory,
+  validateProductFields, // <-- import the validator
 } from "../../../services/apiService";
 
 const ProductForm = () => {
@@ -28,6 +29,7 @@ const ProductForm = () => {
     name: "",
     description: "",
     price: "",
+    stock: 0,
     category_id: "",
     active: true,
     image: null,
@@ -45,54 +47,45 @@ const ProductForm = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        setLoading(true);
+        const [categoriesData, productData] = await Promise.all([
+          fetchCategories(),
+          id ? fetchProduct(id) : Promise.resolve(null),
+        ]);
 
-        // Load categories first
-        const categoriesData = await fetchCategories();
-        setCategories(categoriesData);
+        // Filter and sort categories to only show Burgers, Sides, Beverages
+        const allowedCategories = ["Burgers", "Sides", "Beverages"];
+        const filteredCategories = Array.isArray(categoriesData)
+          ? categoriesData.filter((category) =>
+              allowedCategories.includes(category.name)
+            )
+          : [];
+        setCategories(filteredCategories);
 
-        // Check if we need to ensure default categories exist
-        const defaultCategories = ["Burgers", "Sides", "Beverages"];
-        const existingCategoryNames = categoriesData.map((c) => c.name);
+        if (productData) {
+          // Construct the full image URL if it exists
+          const imageUrl = productData.image
+            ? `${process.env.REACT_APP_API_URL || "http://localhost:8000"}${productData.image}`
+            : null;
 
-        const missingCategories = defaultCategories.filter(
-          (name) => !existingCategoryNames.includes(name)
-        );
+          setProduct({
+            name: productData.name || "",
+            description: productData.description || "",
+            price: productData.price || "",
+            stock: productData.stock || 0,
+            category_id: productData.category || "",
+            active: productData.is_available ?? true,
+            image: productData.image || null,
+          });
 
-        // Create missing default categories
-        if (missingCategories.length > 0) {
-          setCreatingCategory(true);
-
-          const newCategoryPromises = missingCategories.map((name) =>
-            createCategory({
-              name,
-              description: `${name} category`,
-              active: true,
-            })
-          );
-
-          const newCategories = await Promise.all(newCategoryPromises);
-
-          // Refresh categories list
-          const updatedCategories = await fetchCategories();
-          setCategories(updatedCategories);
-          setCreatingCategory(false);
-        }
-
-        // If editing, load product data
-        if (isEditing) {
-          const productData = await fetchProduct(id);
-          setProduct(productData);
-
-          if (productData.image) {
-            setImagePreview(productData.image);
+          if (imageUrl) {
+            setImagePreview(imageUrl);
           }
         }
 
         setError(null);
       } catch (err) {
         console.error("Error loading form data:", err);
-        setError("Failed to load data. Please try again.");
+        setError("Failed to load form data. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -107,14 +100,17 @@ const ProductForm = () => {
     if (type === "file") {
       if (files && files[0]) {
         const file = files[0];
+
+        // Check file size (5MB limit)
         if (file.size > 5 * 1024 * 1024) {
-          // 5MB limit
           setImageError("Image size cannot exceed 5MB");
           return;
         }
 
-        if (!file.type.match("image.*")) {
-          setImageError("Please select a valid image file");
+        // Check file type
+        const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+        if (!allowedTypes.includes(file.type)) {
+          setImageError("Please select a valid image file (JPG, PNG, or GIF)");
           return;
         }
 
@@ -131,6 +127,40 @@ const ProductForm = () => {
     } else {
       const newValue = type === "checkbox" ? checked : value;
       setProduct((prev) => ({ ...prev, [name]: newValue }));
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image size should not exceed 5MB");
+        e.target.value = "";
+        return;
+      }
+
+      // Check file type
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+      if (!allowedTypes.includes(file.type)) {
+        setError("Please upload a valid image file (JPEG, PNG, or GIF)");
+        e.target.value = "";
+        return;
+      }
+
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+
+      // Update form data
+      setProduct((prev) => ({
+        ...prev,
+        image: file,
+      }));
+      setError("");
     }
   };
 
@@ -152,26 +182,106 @@ const ProductForm = () => {
     try {
       setSaving(true);
 
-      // Create FormData for file upload
+      // Prepare productData for validation and submission
+      const productData = {
+        name: product.name,
+        description: product.description || "",
+        price: product.price,
+        category_id: product.category_id,
+        active: product.active,
+        stock: product.stock,
+      };
+
+      // Validate required fields using the shared utility
+      const { valid, missingFields } = validateProductFields(productData);
+      if (!valid) {
+        setError(
+          `Cannot save to database: Missing required fields: ${missingFields.join(", ")}`
+        );
+        setValidated(true);
+        setSaving(false);
+        return;
+      }
+
+      // Prepare data for backend (convert types as needed)
+      const backendData = {
+        name: product.name,
+        description: product.description || "",
+        price: parseFloat(product.price),
+        stock: parseInt(product.stock || 0, 10),
+        category: parseInt(product.category_id, 10), // backend expects 'category'
+        active: product.active,
+      };
+
+      // Now create FormData from this object
       const formData = new FormData();
-      Object.keys(product).forEach((key) => {
-        if (product[key] !== null && product[key] !== undefined) {
-          formData.append(key, product[key]);
+      Object.keys(backendData).forEach((key) => {
+        // Skip null or undefined values
+        if (backendData[key] !== null && backendData[key] !== undefined) {
+          formData.append(key, backendData[key]);
         }
       });
 
-      if (isEditing) {
-        await updateProduct(id, formData);
-      } else {
-        await createProduct(formData);
+      // Add image separately, only if it's a new file
+      if (product.image instanceof File) {
+        formData.append("image", product.image);
       }
 
-      navigate("/admin/products", { state: { refresh: true } });
-    } catch (err) {
-      console.error("Error saving product:", err);
-      setError(
-        `Failed to ${isEditing ? "update" : "create"} product. Please try again.`
+      // For debugging - show exact data being submitted
+      console.log(
+        "Form data entries:",
+        Array.from(formData.entries()).map(
+          (entry) => `${entry[0]}: ${entry[1]}`
+        )
       );
+
+      // Make sure to explicitly check required fields have been set properly
+      const requiredFields = ["name", "price", "category"];
+      const missingRequiredFields = requiredFields.filter(
+        (field) => !formData.has(field)
+      );
+
+      if (missingRequiredFields.length > 0) {
+        throw new Error(
+          `Missing required fields in form data: ${missingRequiredFields.join(", ")}`
+        );
+      }
+
+      let result;
+      if (isEditing) {
+        result = await updateProduct(id, formData);
+        console.log("Product successfully updated in database:", result);
+      } else {
+        result = await createProduct(formData);
+        console.log("Product successfully added to database:", result);
+      }
+
+      // Navigate back with success state indicating database operation
+      navigate("/admin/products", {
+        state: {
+          refresh: true,
+          success: `Product "${product.name}" was successfully ${isEditing ? "updated in" : "saved to"} the database.`,
+        },
+      });
+    } catch (err) {
+      console.error("Database operation failed:", err);
+
+      // Handle specific database errors
+      if (err.response?.status === 400) {
+        setError(
+          `Database validation error: ${
+            err.response?.data?.detail ||
+            Object.values(err.response?.data || {})
+              .flat()
+              .join(", ") ||
+            "Please check your input"
+          }`
+        );
+      } else {
+        setError(
+          `Failed to ${isEditing ? "update" : "save"} product in database: ${err.message || "Please try again."}`
+        );
+      }
     } finally {
       setSaving(false);
     }
@@ -190,6 +300,36 @@ const ProductForm = () => {
 
   return (
     <div className="product-form">
+      {/* Admin menu/navigation */}
+      <div className="mb-3">
+        <nav className="admin-menu">
+          <ul
+            style={{
+              listStyle: "none",
+              padding: 0,
+              margin: 0,
+              display: "flex",
+              gap: "1.5rem",
+            }}
+          >
+            <li>
+              <button
+                type="button"
+                className="btn btn-link p-0"
+                style={{
+                  textDecoration: "none",
+                  color: "#0d6efd",
+                  fontWeight: 500,
+                }}
+                onClick={() => navigate("/admin/products")}
+              >
+                Products
+              </button>
+            </li>
+            {/* Add more menu items here if needed */}
+          </ul>
+        </nav>
+      </div>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>{isEditing ? "Edit Product" : "Add New Product"}</h2>
         <Button variant="secondary" onClick={() => navigate("/admin/products")}>
@@ -234,7 +374,7 @@ const ProductForm = () => {
                 </Form.Group>
 
                 <Row>
-                  <Col md={6}>
+                  <Col md={4}>
                     <Form.Group className="mb-3">
                       <Form.Label>Price (₱)</Form.Label>
                       <Form.Control
@@ -250,7 +390,23 @@ const ProductForm = () => {
                       </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
-                  <Col md={6}>
+                  <Col md={4}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Stock Quantity</Form.Label>
+                      <Form.Control
+                        type="number"
+                        min="0"
+                        step="1"
+                        name="stock"
+                        value={product.stock || 0}
+                        onChange={handleChange}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        Please enter a valid quantity.
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                  <Col md={4}>
                     <Form.Group className="mb-3">
                       <Form.Label>Category</Form.Label>
                       <Form.Select
@@ -259,29 +415,12 @@ const ProductForm = () => {
                         onChange={handleChange}
                         required
                       >
-                        <option value="">Select a category</option>
-                        {categories
-                          .sort((a, b) => {
-                            // Sort to prioritize burger, sides, beverages first
-                            const defaultOrder = [
-                              "Burgers",
-                              "Sides",
-                              "Beverages",
-                            ];
-                            const aIndex = defaultOrder.indexOf(a.name);
-                            const bIndex = defaultOrder.indexOf(b.name);
-
-                            if (aIndex !== -1 && bIndex !== -1)
-                              return aIndex - bIndex;
-                            if (aIndex !== -1) return -1;
-                            if (bIndex !== -1) return 1;
-                            return a.name.localeCompare(b.name);
-                          })
-                          .map((category) => (
-                            <option key={category.id} value={category.id}>
-                              {category.name}
-                            </option>
-                          ))}
+                        <option value="">Select Category</option>
+                        {categories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
                       </Form.Select>
                       <Form.Control.Feedback type="invalid">
                         Please select a category.
@@ -293,7 +432,7 @@ const ProductForm = () => {
                 <Form.Group className="mb-3">
                   <Form.Check
                     type="checkbox"
-                    label="Active"
+                    label="Active (available for sale)"
                     name="active"
                     checked={product.active}
                     onChange={handleChange}
@@ -304,29 +443,31 @@ const ProductForm = () => {
               <Col md={4}>
                 <Form.Group className="mb-3">
                   <Form.Label>Product Image</Form.Label>
-                  <Form.Control
+                  <input
                     type="file"
-                    name="image"
-                    onChange={handleChange}
-                    accept="image/*"
+                    className="form-control"
+                    id="image"
+                    accept="image/jpeg,image/png,image/gif"
+                    onChange={handleImageChange}
                   />
-                  {imageError && (
-                    <div className="text-danger mt-2">{imageError}</div>
-                  )}
-                  <div className="text-muted mt-1">
-                    <small>Max size: 5MB. Format: JPG, PNG, GIF.</small>
-                  </div>
-
                   {imagePreview && (
-                    <div className="mt-3 text-center">
-                      <Image
+                    <div className="mt-2">
+                      <img
                         src={imagePreview}
-                        alt="Product preview"
-                        thumbnail
-                        style={{ maxHeight: "200px" }}
+                        alt="Preview"
+                        style={{ maxWidth: "150px", maxHeight: "150px" }}
+                        className="img-thumbnail"
+                        onError={(e) => {
+                          console.error("Image failed to load:", imagePreview);
+                          e.target.src = "/placeholder-image.jpg";
+                          setError(
+                            "Failed to load product image. Using placeholder instead."
+                          );
+                        }}
                       />
                     </div>
                   )}
+                  {error && <div className="text-danger">{error}</div>}
                 </Form.Group>
               </Col>
             </Row>

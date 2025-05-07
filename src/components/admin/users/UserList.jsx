@@ -7,7 +7,7 @@ import {
   Badge,
   Form,
   InputGroup,
-  Modal,
+  Pagination,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import {
@@ -19,6 +19,7 @@ import {
   FaSync,
 } from "react-icons/fa";
 import { fetchUsers, deleteUser } from "../../../services/apiService";
+import UserDeleteConfirmation from "./UserDeleteConfirmation";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -28,13 +29,17 @@ const UserList = () => {
   const [filterRole, setFilterRole] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-  const [deletingUser, setDeletingUser] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(10);
 
   const loadUsers = async () => {
     try {
       setLoading(true);
       const data = await fetchUsers();
-      setUsers(data);
+      setUsers(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
       console.error("Error loading users:", err);
@@ -62,34 +67,33 @@ const UserList = () => {
     setUserToDelete(null);
   };
 
-  const handleDeleteUser = async () => {
+  const handleDeleteUser = async (userId) => {
     try {
-      setDeletingUser(true);
-      await deleteUser(userToDelete.id);
+      const result = await deleteUser(userId);
 
-      // Remove the user from the state
-      setUsers((prevUsers) =>
-        prevUsers.filter((user) => user.id !== userToDelete.id)
-      );
+      // Check if it was a real success or forced success
+      if (result.forcedSuccess) {
+        setError(
+          "User was not deleted from the database. Error: " +
+            (result.message ||
+              "Database error. Please run migrations on the backend.")
+        );
+        return;
+      }
 
-      handleCloseDeleteModal();
+      // Only remove from UI and show success message if actually deleted
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+      setSuccessMessage("User was successfully deleted.");
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       console.error("Error deleting user:", err);
-      setError("Failed to delete user: " + (err.message || "Unknown error"));
+      setError(
+        `Failed to delete user: ${err.message || "Database error"}. If this is a database error, try running 'python manage.py migrate' on your backend.`
+      );
     } finally {
-      setDeletingUser(false);
+      handleCloseDeleteModal();
     }
   };
-
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesRole = filterRole === "" || user.role === filterRole;
-
-    return matchesSearch && matchesRole;
-  });
 
   const getRoleBadgeVariant = (role) => {
     switch (role) {
@@ -101,6 +105,26 @@ const UserList = () => {
         return "info";
     }
   };
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Filter users based on search term and role
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = filterRole === "" || user.role === filterRole;
+    return matchesSearch && matchesRole;
+  });
+
+  // Calculate pagination
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
   if (loading && users.length === 0) {
     return (
@@ -132,6 +156,16 @@ const UserList = () => {
       {error && (
         <Alert variant="danger" onClose={() => setError(null)} dismissible>
           {error}
+        </Alert>
+      )}
+
+      {successMessage && (
+        <Alert
+          variant="success"
+          onClose={() => setSuccessMessage("")}
+          dismissible
+        >
+          {successMessage}
         </Alert>
       )}
 
@@ -173,103 +207,132 @@ const UserList = () => {
           <p className="mb-0">No users found matching your criteria.</p>
         </div>
       ) : (
-        <Table striped bordered hover responsive>
-          <thead className="bg-light">
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map((user) => (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.phone || "-"}</td>
-                <td>
-                  <Badge
-                    bg={getRoleBadgeVariant(user.role)}
-                    className="text-capitalize"
-                  >
-                    {user.role}
-                  </Badge>
-                  {user.is_staff && !user.is_superuser && (
-                    <Badge bg="info" className="ms-1">
-                      Staff
-                    </Badge>
-                  )}
-                  {user.is_superuser && (
-                    <Badge bg="dark" className="ms-1">
-                      Super
-                    </Badge>
-                  )}
-                </td>
-                <td>
-                  <Badge bg={user.active ? "success" : "secondary"}>
-                    {user.active ? "Active" : "Inactive"}
-                  </Badge>
-                </td>
-                <td>
-                  <div className="d-flex gap-2">
-                    <Link
-                      to={`/admin/users/edit/${user.id}`}
-                      className="btn btn-sm btn-outline-primary"
-                    >
-                      <FaEdit /> Edit
-                    </Link>
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      onClick={() => handleShowDeleteModal(user)}
-                      disabled={user.role === "admin" || user.is_superuser} // Prevent deleting admin or superuser
-                    >
-                      <FaTrash /> Delete
-                    </Button>
-                  </div>
-                </td>
+        <>
+          <Table striped bordered hover responsive>
+            <thead className="bg-light">
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {currentUsers.map((user) => (
+                <tr key={user.id}>
+                  <td>{user.id}</td>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.phone || "-"}</td>
+                  <td>
+                    <Badge
+                      bg={getRoleBadgeVariant(user.role)}
+                      className="text-capitalize"
+                    >
+                      {user.role}
+                    </Badge>
+                    {user.is_staff && !user.is_superuser && (
+                      <Badge bg="info" className="ms-1">
+                        Staff
+                      </Badge>
+                    )}
+                    {user.is_superuser && (
+                      <Badge bg="dark" className="ms-1">
+                        Super
+                      </Badge>
+                    )}
+                  </td>
+                  <td>
+                    <Badge bg={user.active ? "success" : "secondary"}>
+                      {user.active ? "Active" : "Inactive"}
+                    </Badge>
+                  </td>
+                  <td>
+                    <div className="d-flex gap-2">
+                      <Link
+                        to={`/admin/users/edit/${user.id}`}
+                        className="btn btn-sm btn-outline-primary"
+                      >
+                        <FaEdit /> Edit
+                      </Link>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleShowDeleteModal(user)}
+                        disabled={user.role === "admin" || user.is_superuser}
+                      >
+                        <FaTrash /> Delete
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="d-flex justify-content-center mt-4">
+              <Pagination>
+                <Pagination.First
+                  onClick={() => handlePageChange(1)}
+                  disabled={currentPage === 1}
+                />
+                <Pagination.Prev
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                />
+                {[...Array(totalPages)].map((_, idx) => {
+                  const pageNumber = idx + 1;
+                  if (
+                    pageNumber === 1 ||
+                    pageNumber === totalPages ||
+                    (pageNumber >= currentPage - 2 &&
+                      pageNumber <= currentPage + 2)
+                  ) {
+                    return (
+                      <Pagination.Item
+                        key={pageNumber}
+                        active={pageNumber === currentPage}
+                        onClick={() => handlePageChange(pageNumber)}
+                      >
+                        {pageNumber}
+                      </Pagination.Item>
+                    );
+                  } else if (
+                    pageNumber === currentPage - 3 ||
+                    pageNumber === currentPage + 3
+                  ) {
+                    return (
+                      <Pagination.Ellipsis key={`ellipsis-${pageNumber}`} />
+                    );
+                  }
+                  return null;
+                })}
+                <Pagination.Next
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                />
+                <Pagination.Last
+                  onClick={() => handlePageChange(totalPages)}
+                  disabled={currentPage === totalPages}
+                />
+              </Pagination>
+            </div>
+          )}
+        </>
       )}
 
-      {/* Delete Confirmation Modal */}
-      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Delete User</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>
-            Are you sure you want to delete user {userToDelete?.name}? This
-            action cannot be undone.
-          </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseDeleteModal}>
-            Cancel
-          </Button>
-          <Button
-            variant="danger"
-            onClick={handleDeleteUser}
-            disabled={deletingUser}
-          >
-            {deletingUser ? (
-              <>
-                <Spinner animation="border" size="sm" className="me-2" />{" "}
-                Deleting...
-              </>
-            ) : (
-              "Delete"
-            )}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {/* Use UserDeleteConfirmation modal */}
+      <UserDeleteConfirmation
+        show={showDeleteModal}
+        handleClose={handleCloseDeleteModal}
+        user={userToDelete}
+        onUserDeleted={(deletedUserId) => handleDeleteUser(deletedUserId)}
+      />
     </div>
   );
 };

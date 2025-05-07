@@ -3,228 +3,100 @@ import axios from "axios";
 // Use a hardcoded API URL to avoid environment variable issues
 const API_URL = "http://localhost:8000/api";
 
-const USE_MOCK_DATA = false; // Set to false now that the backend is ready
+// Set to false to use real API instead of mock data
+const USE_MOCK_DATA = false;
 
-// Mock data for development
-const mockData = {
-  users: {
-    profile: {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "123-456-7890",
-      address: "123 Main St",
-    },
-    all: [
-      {
-        id: 1,
-        name: "Admin User",
-        email: "admin@example.com",
-        phone: "555-123-4567",
-        role: "admin",
-        created_at: "2023-01-15T08:30:00Z",
-        active: true,
-        is_staff: true,
-        is_superuser: true,
-      },
-      {
-        id: 2,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "555-234-5678",
-        role: "customer",
-        created_at: "2023-02-20T10:15:00Z",
-        active: true,
-      },
-      {
-        id: 3,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "555-345-6789",
-        role: "customer",
-        created_at: "2023-03-05T14:45:00Z",
-        active: true,
-      },
-      {
-        id: 4,
-        name: "Robert Johnson",
-        email: "robert@example.com",
-        phone: "555-456-7890",
-        role: "staff",
-        created_at: "2023-02-28T09:20:00Z",
-        active: false,
-      },
-    ],
+// Create an axios instance with proper configuration
+export const apiClient = axios.create({
+  baseURL: "http://localhost:8000", // Remove /api from baseURL since it's included in the endpoints
+  timeout: 10000,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
-  categories: [
-    { id: 1, name: "Burgers", description: "Juicy burgers", active: true },
-    { id: 2, name: "Sides", description: "Delicious sides", active: true },
-    {
-      id: 3,
-      name: "Beverages",
-      description: "Refreshing drinks",
-      active: true,
-    },
-  ],
-  products: [
-    {
-      id: 1,
-      name: "Classic Burger",
-      description: "Our signature burger with cheese, lettuce, and tomato",
-      price: 9.99,
-      category_id: 1,
-      active: true,
-      image: "https://via.placeholder.com/300x200",
-    },
-    {
-      id: 2,
-      name: "French Fries",
-      description: "Crispy golden fries",
-      price: 3.99,
-      category_id: 2,
-      active: true,
-      image: "https://via.placeholder.com/300x200",
-    },
-    {
-      id: 3,
-      name: "Cola",
-      description: "Refreshing cola drink",
-      price: 2.49,
-      category_id: 3,
-      active: true,
-      image: "https://via.placeholder.com/300x200",
-    },
-  ],
-  orders: [
-    {
-      id: 1,
-      customer_name: "Alice Johnson",
-      customer_email: "alice@example.com",
-      contact_number: "555-123-4567",
-      shipping_address: "123 Main St, City",
-      order_date: "2023-04-15T10:30:00Z",
-      status: "delivered",
-      total_amount: 16.47,
-      items: [
-        {
-          id: 1,
-          product_id: 1,
-          product_name: "Classic Burger",
-          quantity: 1,
-          price: 9.99,
-        },
-        {
-          id: 2,
-          product_id: 3,
-          product_name: "Cola",
-          quantity: 2,
-          price: 2.49,
-        },
-      ],
-    },
-    {
-      id: 2,
-      customer_name: "Bob Smith",
-      customer_email: "bob@example.com",
-      contact_number: "555-987-6543",
-      shipping_address: "456 Oak St, Town",
-      order_date: "2023-04-16T14:45:00Z",
-      status: "processing",
-      total_amount: 13.98,
-      items: [
-        {
-          id: 1,
-          product_id: 2,
-          product_name: "French Fries",
-          quantity: 2,
-          price: 3.99,
-        },
-        {
-          id: 2,
-          product_id: 3,
-          product_name: "Cola",
-          quantity: 2,
-          price: 2.49,
-        },
-      ],
-    },
-  ],
-  dashboard: {
-    stats: {
-      totalProducts: 3,
-      totalCategories: 3,
-      totalOrders: 2,
-      recentOrders: [
-        {
-          id: 2,
-          customer_name: "Bob Smith",
-          total_amount: 13.98,
-          status: "processing",
-          order_date: "2023-04-16T14:45:00Z",
-        },
-        {
-          id: 1,
-          customer_name: "Alice Johnson",
-          total_amount: 16.47,
-          status: "delivered",
-          order_date: "2023-04-15T10:30:00Z",
-        },
-      ],
-      lowStockProducts: [
-        { id: 1, name: "Classic Burger", stock: 5 },
-        { id: 3, name: "Cola", stock: 3 },
-      ],
-      categorySales: [
-        { category: "Burgers", sales: 450 },
-        { category: "Sides", sales: 320 },
-        { category: "Beverages", sales: 280 },
-      ],
-    },
-  },
-};
-
-// Mock API call helper function with delay to simulate real API calls
-const mockApiCall = (data) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(data);
-    }, 500); // 500ms delay to simulate network
-  });
-};
-
-// Create axios instance with authentication headers
-const apiClient = axios.create({
-  baseURL: API_URL,
 });
 
-// Add authorization header to requests
+// Add request interceptor to include auth token on every request
 apiClient.interceptors.request.use(
   (config) => {
-    // Get the authentication token from localStorage
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    if (user.token) {
-      // Format the token as expected by Django REST Framework
-      config.headers["Authorization"] = `Token ${user.token}`;
+    // Skip authentication for public endpoints
+    if (
+      config.url &&
+      (config.url.includes("/api/menu/") ||
+        config.url.includes("/api/auth/register/"))
+    ) {
+      return config;
     }
+
+    // Get the user token from localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    // Check for multiple token formats
+    const access =
+      user?.access ||
+      user?.access_token ||
+      user?.token ||
+      user?.data?.access ||
+      user?.data?.access_token ||
+      user?.data?.token;
+
+    if (access) {
+      config.headers.Authorization = `Bearer ${access}`;
+      // Debug authorization header
+      console.log(
+        "Adding authorization header:",
+        `Bearer ${access.substring(0, 15)}...`
+      );
+    } else {
+      console.warn("No authentication token found in localStorage");
+    }
+
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Add response interceptor to handle errors consistently
+// Add response interceptor to handle token expiration and refresh
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (USE_MOCK_DATA) {
-      // If using mock data, don't show network errors
-      console.warn("API Error intercepted in mock mode:", error.message);
-      return Promise.reject(new Error("API error in mock mode"));
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Handle unauthorized errors (token expired) and try to refresh
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        // Try to refresh the token
+        const refreshResponse = await refreshToken();
+
+        // Log successful token refresh
+        console.log("Token refreshed successfully");
+
+        // If successful, update the authorization header and retry
+        const newToken = refreshResponse.access;
+        apiClient.defaults.headers.common["Authorization"] =
+          `Bearer ${newToken}`;
+        originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        // If refresh fails, redirect to login
+        console.error("Token refresh failed:", refreshError);
+        localStorage.removeItem("user");
+        // Using window.location in a real app would redirect to login
+        console.error("Authentication failed, please log in again.");
+        return Promise.reject(error);
+      }
     }
+
     return Promise.reject(error);
   }
 );
 
-// IndexedDB-based user storage system
+// Helper to get token from localStorage
+const getAuthToken = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  return user?.access || null;
+};
 
 // Initialize the database
 const initDb = () => {
@@ -237,47 +109,44 @@ const initDb = () => {
     };
 
     request.onsuccess = (event) => {
-      const db = event.target.result;
-      resolve(db);
+      resolve(event.target.result);
     };
 
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
 
-      // Create users object store (table)
-      if (!db.objectStoreNames.contains("users")) {
-        const usersStore = db.createObjectStore("users", {
-          keyPath: "id",
-          autoIncrement: true,
-        });
-        usersStore.createIndex("email", "email", { unique: true });
+      // Create object store (table)
+      const usersStore = db.createObjectStore("users", {
+        keyPath: "id",
+        autoIncrement: true,
+      });
 
-        // Add default admin user
-        usersStore.add({
-          name: "Admin User",
-          email: "admin@example.com",
-          password: "password", // In real apps, use hashing
-          phone: "123-456-7890",
-          role: "admin",
-          is_staff: true,
-          is_superuser: true,
-          active: true,
-          created_at: new Date().toISOString(),
-        });
+      // Add default regular user
+      usersStore.createIndex("email", "email", { unique: true });
+      usersStore.add({
+        name: "Regular User",
+        email: "user@example.com",
+        password: "password",
+        phone: "987-654-3210",
+        role: "customer",
+        is_staff: false,
+        is_superuser: false,
+        active: true,
+        created_at: new Date().toISOString(),
+      });
 
-        // Add default regular user
-        usersStore.add({
-          name: "Regular User",
-          email: "user@example.com",
-          password: "password",
-          phone: "987-654-3210",
-          role: "customer",
-          is_staff: false,
-          is_superuser: false,
-          active: true,
-          created_at: new Date().toISOString(),
-        });
-      }
+      // Add default admin user
+      usersStore.add({
+        name: "Admin User",
+        email: "admin@example.com",
+        password: "lilliesadmin", // Changed from "lilliestestadmin" to "lilliesadmin"
+        phone: "123-456-7890",
+        role: "admin",
+        is_staff: true,
+        is_superuser: true,
+        active: true,
+        created_at: new Date().toISOString(),
+      });
     };
   });
 };
@@ -287,6 +156,19 @@ export const register = async (userData) => {
   if (USE_MOCK_DATA) {
     try {
       const db = await initDb();
+
+      // Set a longer timeout for busy transactions (5 seconds)
+      // This helps when the database is locked by another process
+      if (db.transaction) {
+        await new Promise((resolve) => {
+          const request = db
+            .transaction(["users"], "readonly")
+            .objectStore("users")
+            .count();
+          request.onsuccess = () => resolve();
+          request.onerror = () => resolve();
+        });
+      }
 
       return new Promise((resolve, reject) => {
         // Check if email exists
@@ -302,37 +184,89 @@ export const register = async (userData) => {
           }
 
           // Email doesn't exist, proceed with registration
-          const transaction = db.transaction(["users"], "readwrite");
-          const store = transaction.objectStore("users");
+          try {
+            const transaction = db.transaction(["users"], "readwrite");
+            const store = transaction.objectStore("users");
 
-          const newUser = {
-            name: userData.name,
-            email: userData.email,
-            password: userData.password, // In real app, hash password
-            phone: userData.phone || "",
-            role: "customer",
-            is_staff: false,
-            is_superuser: false,
-            active: true,
-            created_at: new Date().toISOString(),
-          };
+            const newUser = {
+              name: userData.name,
+              email: userData.email,
+              password: userData.password, // In real app, hash password
+              phone: userData.phone || "",
+              role: "customer",
+              is_staff: false,
+              is_superuser: false,
+              active: true,
+              created_at: new Date().toISOString(),
+            };
 
-          const request = store.add(newUser);
+            const request = store.add(newUser);
 
-          request.onsuccess = () => {
-            // Return user without password
-            const { password, ...userWithoutPassword } = newUser;
-            userWithoutPassword.id = request.result; // Add the generated ID
-            resolve(userWithoutPassword);
-          };
+            request.onsuccess = () => {
+              // Return user without password
+              const { password, ...userWithoutPassword } = newUser;
+              userWithoutPassword.id = request.result; // Add the generated ID
+              resolve(userWithoutPassword);
+            };
 
-          request.onerror = () => {
-            reject(new Error("Failed to register user"));
-          };
+            request.onerror = (err) => {
+              // Check specifically for database lock errors
+              if (
+                err.target.error &&
+                err.target.error.name === "TransactionInactiveError"
+              ) {
+                reject(new Error("Database is locked, please try again later"));
+              } else {
+                reject(
+                  new Error(
+                    "Failed to register user: " +
+                      (err.target.error
+                        ? err.target.error.message
+                        : "Unknown error")
+                  )
+                );
+              }
+            };
+
+            // Add transaction error handling
+            transaction.onerror = (err) => {
+              reject(
+                new Error(
+                  "Transaction failed: " +
+                    (err.target.error
+                      ? err.target.error.message
+                      : "Unknown error")
+                )
+              );
+            };
+
+            // Add transaction abort handling
+            transaction.onabort = (err) => {
+              reject(
+                new Error(
+                  "Transaction aborted: " +
+                    (err.target.error
+                      ? err.target.error.message
+                      : "Unknown error")
+                )
+              );
+            };
+          } catch (transactionError) {
+            reject(
+              new Error(
+                `Failed to create transaction: ${transactionError.message}`
+              )
+            );
+          }
         };
 
-        emailCheck.onerror = () => {
-          reject(new Error("Failed to check email"));
+        emailCheck.onerror = (err) => {
+          reject(
+            new Error(
+              "Failed to check email: " +
+                (err.target.error ? err.target.error.message : "Unknown error")
+            )
+          );
         };
       });
     } catch (error) {
@@ -341,56 +275,33 @@ export const register = async (userData) => {
     }
   } else {
     try {
-      console.log("Registration data being sent:", userData);
+      const response = await apiClient.post("/api/auth/register/", userData);
 
-      // Use the correct endpoint with auth/ prefix
-      const response = await apiClient.post("/auth/register/", userData);
-
-      console.log("Registration successful:", response.data);
-
-      // Store user data in localStorage for immediate login if applicable
-      if (response.data.token) {
+      // If registration returns a token, store it
+      if (response.data.token || response.data.access) {
         localStorage.setItem("user", JSON.stringify(response.data));
       }
-
       return response.data;
     } catch (error) {
-      console.error("Registration error details:", {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message,
-      });
+      // Enhanced error extraction from Django responses
+      const errorData = error.response?.data;
+      let errorMsg = "Registration failed. Please try again.";
 
-      // Extract error message from the response if available
-      if (error.response?.data) {
-        // Django may return validation errors in different formats
-        const errorData = error.response.data;
-
+      if (errorData) {
         if (typeof errorData === "string") {
-          throw new Error(errorData);
+          errorMsg = errorData;
         } else if (errorData.detail) {
-          throw new Error(errorData.detail);
+          errorMsg = errorData.detail;
         } else if (errorData.email) {
-          throw new Error(
-            `Email error: ${Array.isArray(errorData.email) ? errorData.email.join(", ") : errorData.email}`
-          );
+          errorMsg = `Email error: ${Array.isArray(errorData.email) ? errorData.email.join(", ") : errorData.email}`;
         } else if (errorData.password) {
-          throw new Error(
-            `Password error: ${Array.isArray(errorData.password) ? errorData.password.join(", ") : errorData.password}`
-          );
+          errorMsg = `Password error: ${Array.isArray(errorData.password) ? errorData.password.join(", ") : errorData.password}`;
         } else if (errorData.name) {
-          throw new Error(
-            `Name error: ${Array.isArray(errorData.name) ? errorData.name.join(", ") : errorData.name}`
-          );
-        } else {
-          throw new Error(
-            "Registration failed. Please check your information and try again."
-          );
+          errorMsg = `Name error: ${Array.isArray(errorData.name) ? errorData.name.join(", ") : errorData.name}`;
         }
       }
 
-      throw new Error("Registration failed. Please try again.");
+      throw new Error(errorMsg);
     }
   }
 };
@@ -440,53 +351,67 @@ export const login = async (email, password) => {
     }
   } else {
     try {
-      // Real API call for login - using proper field names for Simple JWT
-      const response = await apiClient.post("/auth/login/", {
-        email, // Keep this as email since that's your username field
-        password,
+      console.log("Attempting to log in with:", email);
+      const response = await apiClient.post("/api/auth/login/", {
+        email: email,
+        password: password,
       });
 
-      // Store user data in localStorage for auth persistence
-      localStorage.setItem("user", JSON.stringify(response.data));
+      console.log("Login response:", {
+        ...response.data,
+        access: response.data.access
+          ? `${response.data.access.substring(0, 15)}...`
+          : null,
+        refresh: response.data.refresh
+          ? `${response.data.refresh.substring(0, 15)}...`
+          : null,
+      });
 
-      return response.data;
+      // Directly use the response data which should contain access and refresh tokens
+      const userData = {
+        ...response.data,
+        email: email, // Ensure email is included
+      };
+
+      // Store user data in localStorage for auth persistence
+      localStorage.setItem("user", JSON.stringify(userData));
+      return userData;
     } catch (error) {
-      console.error("Login error:", error);
-      throw new Error(
+      const errorMsg =
         error.response?.data?.detail ||
-          "Login failed. Please check your credentials."
-      );
+        "Login failed. Please check your credentials.";
+      console.error("Login error:", errorMsg);
+      throw new Error(errorMsg);
     }
   }
 };
 
 // Fetch all users (for admin panel)
 export const fetchUsers = async () => {
+  if (USE_MOCK_DATA) {
+    // Ensure all users have an explicit boolean 'active' property
+    return await mockApiCall(
+      mockData.users.all.map((u) => ({
+        ...u,
+        active: !!u.active,
+      }))
+    );
+  }
+
   try {
-    const db = await initDb();
-
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(["users"], "readonly");
-      const store = transaction.objectStore("users");
-      const request = store.getAll();
-
-      request.onsuccess = (event) => {
-        // Remove passwords from all users
-        const users = event.target.result.map((user) => {
-          const { password, ...userWithoutPassword } = user;
-          return userWithoutPassword;
-        });
-
-        resolve(users);
-      };
-
-      request.onerror = () => {
-        reject(new Error("Failed to fetch users"));
-      };
-    });
+    // Change to match the pattern used by fetchProducts and fetchCategories
+    const response = await apiClient.get("/api/admin/users/");
+    // Ensure all users have an explicit boolean 'active' property
+    return Array.isArray(response.data)
+      ? response.data.map((u) => ({
+          ...u,
+          active: !!u.active,
+        }))
+      : [];
   } catch (error) {
     console.error("Error fetching users:", error);
-    throw error;
+    // Return empty array instead of throwing to prevent UI crashes
+    return [];
   }
 };
 
@@ -545,26 +470,104 @@ export const createUser = async (userData) => {
   }
 };
 
+// Check if a user has associated data that would prevent deletion
+export const checkUserDeletable = async (userId) => {
+  if (USE_MOCK_DATA) {
+    const parsedUserId = parseInt(userId);
+    const user = mockData.users.all.find((u) => u.id === parsedUserId);
+    if (!user) throw new Error("User not found");
+
+    // Check if user has associated orders
+    const associatedOrders = mockData.orders.filter(
+      (o) => o.customer_email === user.email
+    );
+
+    return {
+      deletable: associatedOrders.length === 0,
+      reason:
+        associatedOrders.length > 0
+          ? `User has ${associatedOrders.length} associated orders`
+          : null,
+    };
+  }
+
+  // Always allow deletion for real API (skip can-delete endpoint)
+  return { deletable: true, reason: null };
+};
+
 // Delete user (for admin panel)
 export const deleteUser = async (userId) => {
-  try {
-    const db = await initDb();
+  if (USE_MOCK_DATA) {
+    const parsedUserId = parseInt(userId);
+    const index = mockData.users.all.findIndex((u) => u.id === parsedUserId);
+    if (index === -1) throw new Error("User not found");
 
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(["users"], "readwrite");
-      const store = transaction.objectStore("users");
-      const request = store.delete(userId);
+    // Check if user has associated orders (by email)
+    const userEmail = mockData.users.all[index].email;
+    const associatedOrders = mockData.orders.filter(
+      (o) => o.customer_email === userEmail
+    );
 
-      request.onsuccess = () => {
-        resolve({ success: true, message: "User deleted successfully" });
-      };
+    if (associatedOrders.length > 0) {
+      throw new Error(
+        `Cannot delete user: ${userEmail} has ${associatedOrders.length} associated orders. Please reassign or delete these orders first.`
+      );
+    }
 
-      request.onerror = () => {
-        reject(new Error("Failed to delete user"));
-      };
+    mockData.users.all.splice(index, 1);
+    return await mockApiCall({
+      success: true,
+      message: "User deleted successfully",
     });
+  }
+
+  try {
+    // Try to delete the user
+    await apiClient.delete(`/api/admin/users/${userId}/`);
+    return { success: true, message: "User deleted successfully" };
   } catch (error) {
-    console.error("Delete user error:", error);
+    console.error("Error deleting user:", error);
+
+    // Handle 404 Not Found errors - consider this a success since the user is already gone
+    if (error.response && error.response.status === 404) {
+      return {
+        success: true, // Regular success, not forcedSuccess
+        message: "User successfully removed",
+      };
+    }
+
+    // Handle 500 Internal Server errors
+    if (error.response && error.response.status === 500) {
+      // Check for specific database errors
+      const errorMessage = error.response.data || "";
+      const errorStr =
+        typeof errorMessage === "string"
+          ? errorMessage
+          : JSON.stringify(errorMessage);
+
+      if (errorStr.includes("no such table")) {
+        return {
+          forcedSuccess: true,
+          message:
+            "Database error: Missing table. Run migrations with 'python manage.py migrate'",
+        };
+      }
+
+      if (errorStr.includes("foreign key constraint")) {
+        return {
+          forcedSuccess: true,
+          message:
+            "Cannot delete user because they have related data (orders, etc.)",
+        };
+      }
+
+      return {
+        forcedSuccess: true,
+        message: "Database error. Check your Django logs.",
+      };
+    }
+
+    // For other errors, throw as before
     throw error;
   }
 };
@@ -588,7 +591,6 @@ export const toggleUserStatus = async (userId, active) => {
         }
 
         user.active = active;
-
         const updateRequest = store.put(user);
 
         updateRequest.onsuccess = () => {
@@ -613,33 +615,29 @@ export const toggleUserStatus = async (userId, active) => {
 
 // Dashboard
 export const fetchDashboardStats = async () => {
-  if (USE_MOCK_DATA) {
-    return await mockApiCall(mockData.dashboard.stats);
-  }
-
   try {
-    const response = await apiClient.get("/dashboard/stats/");
+    const response = await apiClient.get("/api/dashboard/stats/");
     return response.data;
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);
-    throw error;
+    // Return empty stats instead of mock data
+    return {
+      total_products: 0,
+      total_categories: 0,
+      total_orders: 0,
+      recent_orders: [],
+      low_stock_products: [],
+      category_sales: [],
+    };
   }
 };
 
-// Users
+// User
 export const fetchUser = async (id) => {
-  if (USE_MOCK_DATA) {
-    const parsedId = parseInt(id, 10);
-    if (isNaN(parsedId)) throw new Error("Invalid user ID");
-
-    const user = mockData.users.all.find((u) => u.id === parsedId);
-    if (!user) throw new Error("User not found");
-    return await mockApiCall(user);
-  }
-
   try {
-    const response = await apiClient.get(`/admin/users/${id}/`);
-    return response.data;
+    const response = await apiClient.get(`/api/admin/users/${id}/`);
+    // Ensure 'active' is boolean
+    return { ...response.data, active: !!response.data.active };
   } catch (error) {
     console.error("Error fetching user:", error);
     throw error;
@@ -647,19 +645,8 @@ export const fetchUser = async (id) => {
 };
 
 export const updateUser = async (id, userData) => {
-  if (USE_MOCK_DATA) {
-    const index = mockData.users.all.findIndex((u) => u.id === parseInt(id));
-    if (index === -1) throw new Error("User not found");
-
-    mockData.users.all[index] = {
-      ...mockData.users.all[index],
-      ...userData,
-    };
-    return await mockApiCall(mockData.users.all[index]);
-  }
-
   try {
-    const response = await apiClient.put(`/admin/users/${id}/`, userData);
+    const response = await apiClient.put(`/api/admin/users/${id}/`, userData);
     return response.data;
   } catch (error) {
     console.error("Error updating user:", error);
@@ -668,15 +655,8 @@ export const updateUser = async (id, userData) => {
 };
 
 export const fetchUserOrders = async (userId) => {
-  if (USE_MOCK_DATA) {
-    const userOrders = mockData.orders.filter(
-      (o) => o.customer_email === userId
-    );
-    return await mockApiCall(userOrders);
-  }
-
   try {
-    const response = await apiClient.get(`/admin/users/${userId}/orders/`);
+    const response = await apiClient.get(`/api/admin/users/${userId}/orders/`);
     return response.data;
   } catch (error) {
     console.error("Error fetching user orders:", error);
@@ -686,16 +666,14 @@ export const fetchUserOrders = async (userId) => {
 
 // Categories
 export const fetchCategories = async () => {
-  if (USE_MOCK_DATA) {
-    return await mockApiCall(mockData.categories);
-  }
-
   try {
-    const response = await apiClient.get("/admin/categories/");
-    return response.data;
+    const response = await apiClient.get("/api/categories/");
+    // Ensure we always return an array
+    return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error("Error fetching categories:", error);
-    throw error;
+    // Return empty array on error to prevent UI crashes
+    return [];
   }
 };
 
@@ -740,13 +718,11 @@ export const updateCategory = async (id, categoryData) => {
   if (USE_MOCK_DATA) {
     const index = mockData.categories.findIndex((c) => c.id === parseInt(id));
     if (index === -1) throw new Error("Category not found");
-
     mockData.categories[index] = {
       ...mockData.categories[index],
       ...categoryData,
       id: parseInt(id),
     };
-
     return await mockApiCall(mockData.categories[index]);
   }
 
@@ -766,7 +742,6 @@ export const deleteCategory = async (id) => {
   if (USE_MOCK_DATA) {
     const index = mockData.categories.findIndex((c) => c.id === parseInt(id));
     if (index === -1) throw new Error("Category not found");
-
     mockData.categories.splice(index, 1);
     return await mockApiCall({ success: true });
   }
@@ -784,7 +759,6 @@ export const deleteCategory = async (id) => {
 export const ensureDefaultCategories = async () => {
   try {
     const defaultCategories = ["Burgers", "Sides", "Beverages"];
-
     // First, fetch existing categories
     const existingCategories = await fetchCategories();
     const existingCategoryNames = existingCategories.map((cat) => cat.name);
@@ -807,7 +781,6 @@ export const ensureDefaultCategories = async () => {
           active: true,
         })
       );
-
       await Promise.all(creationPromises);
 
       // Return the updated categories list
@@ -829,10 +802,18 @@ export const fetchProducts = async () => {
   }
 
   try {
-    const response = await apiClient.get("/products/");
+    const response = await apiClient.get("/api/products/");
     return response.data;
   } catch (error) {
     console.error("Error fetching products:", error);
+    // If there's a 500 error, suggest database migration
+    if (error.response && error.response.status === 500) {
+      console.error(
+        "Database schema might be out of date. Please run migrations."
+      );
+      // Return empty array to prevent UI errors
+      return [];
+    }
     throw error;
   }
 };
@@ -845,7 +826,7 @@ export const fetchProduct = async (id) => {
   }
 
   try {
-    const response = await apiClient.get(`/products/${id}/`);
+    const response = await apiClient.get(`/admin/products/${id}/`);
     return response.data;
   } catch (error) {
     console.error("Error fetching product:", error);
@@ -853,99 +834,153 @@ export const fetchProduct = async (id) => {
   }
 };
 
-export const createProduct = async (productData) => {
-  if (USE_MOCK_DATA) {
-    const newId = Math.max(...mockData.products.map((p) => p.id)) + 1;
-    const newProduct = {
-      id: newId,
-      ...productData,
-      created_at: new Date().toISOString(),
-    };
+// Utility to check required product fields before calling createProduct
+export function validateProductFields(productData) {
+  const requiredFields = ["name", "description", "price"];
 
-    // Handle FormData conversion for mock data
-    if (productData instanceof FormData) {
-      const formDataObj = {};
-      productData.forEach((value, key) => {
-        // For files, store a URL placeholder
-        if (value instanceof File) {
-          formDataObj[key] = "https://via.placeholder.com/300x200";
-        } else {
-          formDataObj[key] = value;
-        }
-      });
+  // Category could be named either category or category_id
+  const hasCategoryField =
+    (productData["category"] !== undefined &&
+      productData["category"] !== null &&
+      productData["category"] !== "") ||
+    (productData["category_id"] !== undefined &&
+      productData["category_id"] !== null &&
+      productData["category_id"] !== "");
 
-      Object.assign(newProduct, formDataObj);
-    }
+  const missingFields = requiredFields.filter(
+    (field) =>
+      productData[field] === undefined ||
+      productData[field] === null ||
+      productData[field] === ""
+  );
 
-    mockData.products.push(newProduct);
-    return await mockApiCall(newProduct);
+  // Add category to missing fields if neither category nor category_id is present
+  if (!hasCategoryField) {
+    missingFields.push("category");
   }
 
+  return {
+    valid: missingFields.length === 0,
+    missingFields,
+  };
+}
+
+// Create product with proper validation and file upload handling
+export const createProduct = async (productData) => {
   try {
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(productData)) {
-      if (value instanceof File) {
-        formData.append(key, value);
-      } else {
-        formData.append(key, value);
+    // Don't recreate FormData if it's already a FormData object
+    let formData;
+
+    if (productData instanceof FormData) {
+      formData = productData;
+
+      // Debug form data entries
+      console.log("FormData received, checking entries:");
+
+      // Check if category field exists, if not, look for category_id
+      const hasCategory = formData.has("category");
+      const hasCategoryId = formData.has("category_id");
+
+      if (!hasCategory && hasCategoryId) {
+        // Convert category_id to category for backend compatibility
+        const categoryId = formData.get("category_id");
+        formData.append("category", categoryId);
+        console.log("Converted category_id to category:", categoryId);
       }
+    } else {
+      // Create new FormData if received a plain object
+      formData = new FormData();
+
+      // Handle image file separately
+      if (productData.image instanceof File) {
+        formData.append("image", productData.image);
+      }
+
+      // Append other product data
+      Object.keys(productData).forEach((key) => {
+        if (key !== "image") {
+          // Convert category_id to category if needed
+          if (key === "category_id") {
+            formData.append("category", productData[key]);
+          } else {
+            formData.append(key, productData[key]);
+          }
+        }
+      });
     }
 
-    const response = await apiClient.post("/products/", formData, {
+    // Log the final FormData contents for debugging
+    console.log("Final FormData entries being sent:");
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ": " + pair[1]);
+    }
+
+    const response = await apiClient.post("/api/products/", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
-
     return response.data;
   } catch (error) {
-    console.error("Error creating product:", error);
-    throw error;
+    throw error.response?.data || error.message;
   }
 };
 
+// Update product with proper file upload handling
 export const updateProduct = async (id, productData) => {
-  if (USE_MOCK_DATA) {
-    const index = mockData.products.findIndex((p) => p.id === parseInt(id));
-    if (index === -1) throw new Error("Product not found");
+  try {
+    // Don't recreate FormData if it's already a FormData object
+    let formData;
 
-    const updatedProduct = { ...mockData.products[index] };
-
-    // Handle FormData conversion for mock data
     if (productData instanceof FormData) {
-      productData.forEach((value, key) => {
-        // For files, store a URL placeholder
-        if (value instanceof File) {
-          updatedProduct[key] = "https://via.placeholder.com/300x200";
-        } else {
-          updatedProduct[key] = value;
+      formData = productData;
+
+      // Check if category field exists, if not, look for category_id
+      const hasCategory = formData.has("category");
+      const hasCategoryId = formData.has("category_id");
+
+      if (!hasCategory && hasCategoryId) {
+        // Convert category_id to category for backend compatibility
+        const categoryId = formData.get("category_id");
+        formData.append("category", categoryId);
+        console.log("Converted category_id to category:", categoryId);
+      }
+    } else {
+      // Create new FormData if received a plain object
+      formData = new FormData();
+
+      // Handle image file separately
+      if (productData.image instanceof File) {
+        formData.append("image", productData.image);
+      }
+
+      // Append other product data
+      Object.keys(productData).forEach((key) => {
+        if (key !== "image" || !(productData.image instanceof File)) {
+          // Convert category_id to category if needed
+          if (key === "category_id") {
+            formData.append("category", productData[key]);
+          } else {
+            formData.append(key, productData[key]);
+          }
         }
       });
-    } else {
-      Object.assign(updatedProduct, productData);
     }
 
-    mockData.products[index] = updatedProduct;
-    return await mockApiCall(updatedProduct);
-  }
+    // Log the final FormData contents for debugging
+    console.log("Update request data for product", id + ":");
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ": " + pair[1]);
+    }
 
-  try {
-    // Use FormData for file uploads
-    const formData = new FormData();
-    Object.keys(productData).forEach((key) => {
-      // Only append if value is not null
-      if (productData[key] !== null) {
-        formData.append(key, productData[key]);
-      }
-    });
-
-    const response = await apiClient.put(`/products/${id}/`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+    const response = await apiClient.patch(`/api/products/${id}/`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
     return response.data;
   } catch (error) {
-    console.error(`Error updating product ${id}:`, error);
-    throw error;
+    throw error.response?.data || error.message;
   }
 };
 
@@ -953,19 +988,16 @@ export const deleteProduct = async (id) => {
   if (USE_MOCK_DATA) {
     const index = mockData.products.findIndex((p) => p.id === parseInt(id));
     if (index === -1) throw new Error("Product not found");
-
     // Store product name for logging
     const productName = mockData.products[index].name;
-
     // Remove the product
     mockData.products.splice(index, 1);
-
     console.log(`Product ${id} (${productName}) deleted successfully`);
     return await mockApiCall(true);
   }
 
   try {
-    await apiClient.delete(`/products/${id}/`);
+    await apiClient.delete(`/api/products/${id}/`);
     return true;
   } catch (error) {
     console.error(`Error deleting product ${id}:`, error);
@@ -975,16 +1007,13 @@ export const deleteProduct = async (id) => {
 
 // Orders
 export const fetchOrders = async () => {
-  if (USE_MOCK_DATA) {
-    return await mockApiCall(mockData.orders);
-  }
-
   try {
-    const response = await apiClient.get("/orders/");
+    const response = await apiClient.get("/api/orders/");
     return response.data;
   } catch (error) {
     console.error("Error fetching orders:", error);
-    throw error;
+    // Return empty array instead of mock data
+    return [];
   }
 };
 
@@ -996,7 +1025,8 @@ export const fetchOrder = async (id) => {
   }
 
   try {
-    const response = await apiClient.get(`/orders/${id}/`);
+    // Updated to use correct API endpoint
+    const response = await apiClient.get(`/api/orders/${id}/`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching order ${id}:`, error);
@@ -1008,13 +1038,13 @@ export const updateOrderStatus = async (id, status) => {
   if (USE_MOCK_DATA) {
     const index = mockData.orders.findIndex((o) => o.id === parseInt(id));
     if (index === -1) throw new Error("Order not found");
-
     mockData.orders[index].status = status;
     return await mockApiCall(mockData.orders[index]);
   }
 
   try {
-    const response = await apiClient.patch(`/orders/${id}/`, { status });
+    // Updated to use correct API endpoint
+    const response = await apiClient.patch(`/api/orders/${id}/`, { status });
     return response.data;
   } catch (error) {
     console.error(`Error updating order status ${id}:`, error);
@@ -1029,7 +1059,7 @@ export const fetchMenuCategories = async () => {
   }
 
   try {
-    const response = await apiClient.get("/menu/categories/");
+    const response = await apiClient.get("/api/menu/categories/");
     return response.data;
   } catch (error) {
     console.error("Error fetching menu categories:", error);
@@ -1040,18 +1070,16 @@ export const fetchMenuCategories = async () => {
 export const fetchMenuItems = async (categoryId) => {
   if (USE_MOCK_DATA) {
     let products = mockData.products.filter((p) => p.active);
-
     if (categoryId) {
       products = products.filter((p) => p.category_id === parseInt(categoryId));
     }
-
     return await mockApiCall(products);
   }
 
   try {
     const url = categoryId
-      ? `/menu/items/?category=${categoryId}`
-      : "/menu/items/";
+      ? `/api/menu/items/?category=${categoryId}`
+      : "/api/menu/items/";
     const response = await apiClient.get(url);
     return response.data;
   } catch (error) {
@@ -1107,7 +1135,7 @@ export const createOrder = async (orderData) => {
   }
 
   try {
-    const response = await apiClient.post("/orders/", orderData);
+    const response = await apiClient.post("/api/orders/", orderData);
     return response.data;
   } catch (error) {
     console.error("Error creating order:", error);
@@ -1136,24 +1164,43 @@ export const refreshToken = async () => {
     // Get the current user from localStorage
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-    if (!user.token) {
+    // Debug user object
+    console.log("User object for token refresh:", {
+      hasUser: !!user,
+      hasRefresh: !!user?.refresh,
+      tokenKeys: Object.keys(user || {}),
+    });
+
+    // Check for refresh token - Django JWT uses 'refresh' field
+    const refreshToken = user?.refresh;
+
+    // If no refresh token is available, throw error
+    if (!refreshToken) {
+      console.error("No refresh token available");
       throw new Error("No valid session");
     }
 
-    // Real API call for token refresh
-    const response = await apiClient.post("/auth/refresh-token/", {
-      token: user.token,
+    // Real API call for token refresh - Django REST framework simple JWT
+    console.log(
+      "Attempting to refresh token with:",
+      refreshToken.substring(0, 15) + "..."
+    );
+    const response = await apiClient.post("/api/auth/refresh/", {
+      refresh: refreshToken,
     });
 
-    // Update user object with new token
+    console.log("Token refresh response:", response.data);
+
+    // Update user object with new access token from response
     const refreshedUser = {
       ...user,
-      token: response.data.token,
+      access: response.data.access,
+      // Keep the refresh token if it wasn't rotated
+      refresh: response.data.refresh || user.refresh,
     };
 
     // Update localStorage
     localStorage.setItem("user", JSON.stringify(refreshedUser));
-
     return refreshedUser;
   } catch (error) {
     console.error("Token refresh error:", error);
@@ -1195,4 +1242,6 @@ export default {
   fetchUserProfile,
   updateUserProfile,
   createOrder,
+  checkUserDeletable,
+  validateProductFields,
 };

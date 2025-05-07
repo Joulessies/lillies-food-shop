@@ -24,6 +24,8 @@ const DashboardHome = () => {
     recentOrders: [],
     lowStockProducts: [],
     categorySales: [],
+    recentProducts: [],
+    categories: [],
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -53,8 +55,11 @@ const DashboardHome = () => {
         lowStockProducts:
           data.low_stock_products || data.lowStockProducts || [],
         categorySales: data.category_sales || data.categorySales || [],
+        recentProducts: data.recent_products || data.recentProducts || [],
+        categories: data.categories || [],
       });
 
+      // Update last updated timestamp
       setLastUpdated(new Date());
       setError(null);
     } catch (err) {
@@ -120,7 +125,24 @@ const DashboardHome = () => {
     <div className="dashboard-home">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="dashboard-title mb-0">Dashboard Overview</h2>
-        <div>
+        <div className="d-flex align-items-center">
+          <Button
+            variant="outline-primary"
+            className="me-3"
+            onClick={handleRefresh}
+            disabled={refreshing}
+          >
+            {refreshing ? (
+              <>
+                <Spinner animation="border" size="sm" className="me-2" />{" "}
+                Refreshing...
+              </>
+            ) : (
+              <>
+                <FaSync className="me-2" /> Refresh Data
+              </>
+            )}
+          </Button>
           {lastUpdated && (
             <div className="text-muted mt-1 small">
               Last updated: {lastUpdated.toLocaleTimeString()}
@@ -137,6 +159,9 @@ const DashboardHome = () => {
                 <div>
                   <h6 className="stats-title">Total Products</h6>
                   <h2 className="stats-value">{stats.totalProducts}</h2>
+                  <div className="text-muted small">
+                    <Link to="/admin/products">View all products</Link>
+                  </div>
                 </div>
                 <div className="stats-icon">
                   <FaBox />
@@ -153,6 +178,9 @@ const DashboardHome = () => {
                 <div>
                   <h6 className="stats-title">Categories</h6>
                   <h2 className="stats-value">{stats.totalCategories}</h2>
+                  <div className="text-muted small">
+                    <Link to="/admin/categories">View all categories</Link>
+                  </div>
                 </div>
                 <div className="stats-icon">
                   <FaList />
@@ -169,6 +197,9 @@ const DashboardHome = () => {
                 <div>
                   <h6 className="stats-title">Total Orders</h6>
                   <h2 className="stats-value">{stats.totalOrders}</h2>
+                  <div className="text-muted small">
+                    <Link to="/admin/orders">View all orders</Link>
+                  </div>
                 </div>
                 <div className="stats-icon">
                   <FaShoppingCart />

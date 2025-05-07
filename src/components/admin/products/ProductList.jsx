@@ -13,10 +13,11 @@ import {
   OverlayTrigger,
   Tooltip,
 } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { FaEdit, FaTrashAlt, FaPlus, FaSearch } from "react-icons/fa";
 import { fetchProducts, deleteProduct } from "../../../services/apiService";
 import "../../../styles/AdminTables.css";
+import { toast } from "react-toastify";
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -29,6 +30,8 @@ const ProductList = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [addingProduct, setAddingProduct] = useState(false);
+  const [imageError, setImageError] = useState({});
+  const [imageLoading, setImageLoading] = useState({});
 
   const navigate = useNavigate();
 
@@ -78,6 +81,7 @@ const ProductList = () => {
     } catch (err) {
       console.error("Failed to load products:", err);
       setError(err.message || "Failed to load products. Please try again.");
+      toast.error("Failed to load products");
     } finally {
       setLoading(false);
     }
@@ -115,6 +119,7 @@ const ProductList = () => {
 
       // Show success message
       setSuccessMessage(`Product "${productToDelete.name}" has been deleted.`);
+      toast.success("Product deleted successfully");
 
       // Hide success message after 3 seconds
       setTimeout(() => {
@@ -123,6 +128,7 @@ const ProductList = () => {
     } catch (err) {
       console.error("Failed to delete product:", err);
       setError(`Failed to delete product: ${err.message}`);
+      toast.error("Failed to delete product");
     } finally {
       setDeleteLoading(false);
     }
@@ -130,6 +136,22 @@ const ProductList = () => {
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleImageError = (productId) => {
+    console.log(`Image failed to load for product ${productId}`);
+    setImageError((prev) => ({ ...prev, [productId]: true }));
+  };
+
+  const handleImageLoad = (productId) => {
+    console.log(`Image loaded successfully for product ${productId}`);
+    setImageLoading((prev) => ({ ...prev, [productId]: false }));
+  };
+
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith("http")) return imagePath;
+    return `${process.env.REACT_APP_API_URL || "http://localhost:8000"}${imagePath}`;
   };
 
   const filteredProducts = products.filter(
@@ -146,6 +168,14 @@ const ProductList = () => {
           .includes(debouncedSearchQuery.toLowerCase()))
   );
 
+  // Helper function to determine stock status color
+  const getStockStatusColor = (stock) => {
+    if (stock === undefined || stock === null) return "secondary";
+    if (stock <= 0) return "danger";
+    if (stock < 10) return "warning";
+    return "success";
+  };
+
   if (loading) {
     return (
       <div className="text-center my-5">
@@ -161,6 +191,12 @@ const ProductList = () => {
     <div className="product-list">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <h2 className="mb-0 me-2">Products</h2>
+        <Link
+          to="/admin/products/new"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Add New Product
+        </Link>
       </div>
 
       {successMessage && (
@@ -204,11 +240,12 @@ const ProductList = () => {
         <Table hover className="admin-table product-table align-middle">
           <thead>
             <tr>
-              <th style={{ width: "80px" }}>#</th>
-              <th style={{ width: "100px" }}>Image</th>
+              <th style={{ width: "60px" }}>#</th>
+              <th style={{ width: "80px" }}>Image</th>
               <th>Name</th>
               <th>Category</th>
               <th>Price</th>
+              <th>Stock</th>
               <th>Status</th>
               <th style={{ width: "120px" }}>Actions</th>
             </tr>
@@ -219,21 +256,69 @@ const ProductList = () => {
                 <tr key={product.id}>
                   <td>{product.id}</td>
                   <td>
-                    {product.image ? (
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        width={60}
-                        height={60}
-                        className="product-thumbnail"
-                      />
-                    ) : (
-                      <div className="no-image-placeholder">No Image</div>
-                    )}
+                    <div
+                      className="w-16 h-16 flex-shrink-0"
+                      style={{ width: "60px", height: "60px" }}
+                    >
+                      {product.image && !imageError[product.id] ? (
+                        <>
+                          {imageLoading[product.id] !== false && (
+                            <div className="w-full h-full bg-gray-100 rounded flex items-center justify-center">
+                              <Spinner animation="border" size="sm" />
+                            </div>
+                          )}
+                          <img
+                            src={getImageUrl(product.image)}
+                            alt={product.name}
+                            className="w-full h-full object-cover rounded"
+                            onError={() => handleImageError(product.id)}
+                            onLoad={() => handleImageLoad(product.id)}
+                            style={{
+                              display:
+                                imageLoading[product.id] !== false
+                                  ? "none"
+                                  : "block",
+                              width: "60px",
+                              height: "60px",
+                              objectFit: "cover",
+                            }}
+                          />
+                        </>
+                      ) : (
+                        <div
+                          className="w-full h-full bg-gray-100 rounded flex items-center justify-center"
+                          style={{ width: "60px", height: "60px" }}
+                        >
+                          <span className="text-gray-400 text-sm">
+                            No Image
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td>{product.name}</td>
-                  <td>{product.category ? product.category.name : "-"}</td>
+                  <td>{product.category_name || "-"}</td>
                   <td>₱{parseFloat(product.price).toFixed(2)}</td>
+                  <td>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip>
+                          {product.stock <= 0
+                            ? "Out of stock"
+                            : product.stock < 10
+                              ? "Low stock"
+                              : "In stock"}
+                        </Tooltip>
+                      }
+                    >
+                      <Badge bg={getStockStatusColor(product.stock)}>
+                        {product.stock !== undefined && product.stock !== null
+                          ? product.stock
+                          : "N/A"}
+                      </Badge>
+                    </OverlayTrigger>
+                  </td>
                   <td>
                     <Badge bg={product.active ? "success" : "secondary"}>
                       {product.active ? "Active" : "Inactive"}
@@ -263,7 +348,7 @@ const ProductList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="text-center py-4">
+                <td colSpan={8} className="text-center py-4">
                   {searchQuery
                     ? "No products match your search."
                     : "No products found."}
@@ -297,9 +382,10 @@ const ProductList = () => {
                     <Image
                       src={productToDelete.image}
                       alt={productToDelete.name}
-                      width={60}
-                      height={60}
+                      width={50}
+                      height={50}
                       className="product-thumbnail"
+                      style={{ objectFit: "cover" }}
                     />
                   )}
                 </Col>
