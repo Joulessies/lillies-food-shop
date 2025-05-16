@@ -1,0 +1,22 @@
+{
+  "name": "lillies-food-shop",
+  "version": "1.0.0",
+  "description": "This README explains how to set up the Lillies Food Shop application to use a real database in production via ngrok.",
+  "homepage": "https://github.com/Joulessies/lillies-food-shop#readme",
+  "bugs": {
+    "url": "https://github.com/Joulessies/lillies-food-shop/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joulessies/lillies-food-shop.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "build.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {},
+  "keywords": []
+}
