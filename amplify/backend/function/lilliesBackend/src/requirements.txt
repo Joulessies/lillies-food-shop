@@ -1,0 +1,11 @@
+django>=5.0,<5.1
+djangorestframework>=3.14
+django-cors-headers>=4.3
+python-dotenv>=1.0
+django-filter>=23.5
+djangorestframework-simplejwt>=5.3.1
+psycopg2-binary>=2.9.9
+boto3>=1.28.0
+aws-wsgi>=0.2.7
+dj-database-url>=2.1.0
+whitenoise>=6.6.0 

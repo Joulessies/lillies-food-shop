@@ -1,0 +1,1 @@
+web: cd django_backend && python wsgi_handler.py

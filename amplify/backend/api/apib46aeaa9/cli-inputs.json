@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "paths": {
+    "/": {
+      "name": "/",
+      "lambdaFunction": "lilliesfoodshop0d15d09f",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      }
+    }
+  }
+}

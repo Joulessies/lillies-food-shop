@@ -1,0 +1,31 @@
+{% extends "rest_framework/base.html" %} {% block title %}Lillies Food Shop
+API{% endblock %} {% block branding %}
+<a class="navbar-brand" rel="nofollow" href="/"> Lillies Food Shop API </a>
+{% endblock %} {% block description %}
+<div class="container">
+  <h2>Welcome to the Lillies Food Shop API</h2>
+  <p>This API provides access to the Lillies Food Shop application data.</p>
+
+  <h3>Main Endpoints</h3>
+  <ul>
+    <li><code>/api/menu/categories/</code> - Get all menu categories</li>
+    <li>
+      <code>/api/menu/items/</code> - Get all menu items (optionally filtered by
+      category)
+    </li>
+    <li><code>/api/health/</code> - Health check endpoint</li>
+    <li>
+      <code>/api/dashboard/stats/</code> - Dashboard statistics (authenticated
+      users only)
+    </li>
+    <li><code>/api/auth/login/</code> - User login</li>
+    <li><code>/api/auth/register/</code> - User registration</li>
+  </ul>
+
+  <h3>Authentication</h3>
+  <p>
+    Most endpoints require authentication. To authenticate, use the login
+    endpoint to obtain an access token.
+  </p>
+</div>
+{% endblock %}

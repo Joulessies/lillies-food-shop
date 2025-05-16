@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <title>CORS Test</title>
+  </head>
+  <body>
+    <h1>CORS Test</h1>
+    <button id="testBtn">Test API Request</button>
+    <div id="result"></div>
+
+    <script>
+      document.getElementById("testBtn").addEventListener("click", function () {
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = "Testing...";
+
+        fetch("https://88fc-158-62-34-241.ngrok-free.app/api/auth/login/", {
+          method: "OPTIONS",
+          headers: {
+            "Content-Type": "application/json",
+            Origin: "https://main.d1tks6esoyf2em.amplifyapp.com",
+          },
+        })
+          .then((response) => {
+            resultDiv.innerHTML = `
+                    <p>Status: ${response.status}</p>
+                    <p>Headers:</p>
+                    <ul>
+                        <li>Access-Control-Allow-Origin: ${response.headers.get("Access-Control-Allow-Origin")}</li>
+                        <li>Access-Control-Allow-Methods: ${response.headers.get("Access-Control-Allow-Methods")}</li>
+                        <li>Access-Control-Allow-Headers: ${response.headers.get("Access-Control-Allow-Headers")}</li>
+                        <li>Access-Control-Allow-Credentials: ${response.headers.get("Access-Control-Allow-Credentials")}</li>
+                    </ul>
+                `;
+            return response.text();
+          })
+          .then((data) => {
+            resultDiv.innerHTML += `<p>Response data: ${data}</p>`;
+          })
+          .catch((error) => {
+            resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+          });
+      });
+    </script>
+  </body>
+</html>

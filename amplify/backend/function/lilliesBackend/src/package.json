@@ -1,0 +1,12 @@
+{
+  "name": "lillies-backend",
+  "version": "1.0.0",
+  "description": "Lillies Food Shop Django Backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

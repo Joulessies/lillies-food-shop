@@ -1,0 +1,335 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "API Gateway resource stack creation using Amplify CLI",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "functionlilliesBackendName": {
+      "Type": "String",
+      "Default": "functionlilliesBackendName"
+    },
+    "functionlilliesBackendArn": {
+      "Type": "String",
+      "Default": "functionlilliesBackendArn"
+    }
+  },
+  "Resources": {
+    "lilliesapi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Description": "API Gateway for Lillies Food Shop",
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              "lilliesapi-",
+              {
+                "Ref": "env"
+              }
+            ]
+          ]
+        },
+        "EndpointConfiguration": {
+          "Types": ["EDGE"]
+        },
+        "Policy": ""
+      }
+    },
+    "ApiGatewayRootMethodGET": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "GET",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Ref": "functionlilliesBackendArn"
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200"
+          }
+        ],
+        "ResourceId": {
+          "Fn::GetAtt": ["lilliesapi", "RootResourceId"]
+        },
+        "RestApiId": {
+          "Ref": "lilliesapi"
+        }
+      }
+    },
+    "ApiGatewayRootMethodPOST": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "POST",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Ref": "functionlilliesBackendArn"
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200"
+          }
+        ],
+        "ResourceId": {
+          "Fn::GetAtt": ["lilliesapi", "RootResourceId"]
+        },
+        "RestApiId": {
+          "Ref": "lilliesapi"
+        }
+      }
+    },
+    "ApiGatewayRootMethodOPTIONS": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Ref": "functionlilliesBackendArn"
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200"
+          }
+        ],
+        "ResourceId": {
+          "Fn::GetAtt": ["lilliesapi", "RootResourceId"]
+        },
+        "RestApiId": {
+          "Ref": "lilliesapi"
+        }
+      }
+    },
+    "ApiResource": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": ["lilliesapi", "RootResourceId"]
+        },
+        "PathPart": "api",
+        "RestApiId": {
+          "Ref": "lilliesapi"
+        }
+      }
+    },
+    "ApiResourceProxy": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiResource"
+        },
+        "PathPart": "{proxy+}",
+        "RestApiId": {
+          "Ref": "lilliesapi"
+        }
+      }
+    },
+    "ProxyResourceANY": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "ANY",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Ref": "functionlilliesBackendArn"
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200"
+          }
+        ],
+        "RequestParameters": {
+          "method.request.path.proxy": true
+        },
+        "ResourceId": {
+          "Ref": "ApiResourceProxy"
+        },
+        "RestApiId": {
+          "Ref": "lilliesapi"
+        }
+      }
+    },
+    "functionlilliesBackendPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "FunctionName": {
+          "Ref": "functionlilliesBackendName"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "lilliesapi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "DeploymentAPIGW": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "Description": "API deployment",
+        "RestApiId": {
+          "Ref": "lilliesapi"
+        }
+      },
+      "DependsOn": [
+        "ApiGatewayRootMethodGET",
+        "ApiGatewayRootMethodPOST",
+        "ApiGatewayRootMethodOPTIONS",
+        "ProxyResourceANY"
+      ]
+    },
+    "apiGatewayStage": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "DeploymentAPIGW"
+        },
+        "Description": "API Gateway stage",
+        "RestApiId": {
+          "Ref": "lilliesapi"
+        },
+        "StageName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "dev",
+            {
+              "Ref": "env"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "RootUrl": {
+      "Description": "Root URL of the API gateway",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "lilliesapi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".amazonaws.com/",
+            {
+              "Fn::If": [
+                "ShouldNotCreateEnvResources",
+                "dev",
+                {
+                  "Ref": "env"
+                }
+              ]
+            }
+          ]
+        ]
+      }
+    },
+    "ApiName": {
+      "Description": "API Friendly name",
+      "Value": "lilliesapi"
+    },
+    "ApiId": {
+      "Description": "API ID (prefix of API URL)",
+      "Value": {
+        "Ref": "lilliesapi"
+      }
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  }
+}

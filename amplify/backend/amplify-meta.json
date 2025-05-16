@@ -1,0 +1,99 @@
+{
+  "providers": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-lilliesfoodshop-dev-33362-authRole",
+      "UnauthRoleArn": "arn:aws:iam::929999318268:role/amplify-lilliesfoodshop-dev-33362-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::929999318268:role/amplify-lilliesfoodshop-dev-33362-authRole",
+      "Region": "ap-northeast-1",
+      "DeploymentBucketName": "amplify-lilliesfoodshop-dev-33362-deployment",
+      "UnauthRoleName": "amplify-lilliesfoodshop-dev-33362-unauthRole",
+      "StackName": "amplify-lilliesfoodshop-dev-33362",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:929999318268:stack/amplify-lilliesfoodshop-dev-33362/54ef2960-3042-11f0-aca0-0ed208b5edb5",
+      "AmplifyAppId": "d34itxlmfwcuij"
+    }
+  },
+  "api": {
+    "lilliesapi": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "lilliesfoodshop"
+        }
+      ],
+      "output": {
+        "authConfig": {
+          "additionalAuthTypes": [
+            {
+              "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+              "userPoolConfig": {
+                "userPoolId": "authlilliesfoodshop"
+              }
+            }
+          ],
+          "defaultAuthentication": {
+            "apiKeyConfig": {
+              "apiKeyExpirationDate": "2025-05-14T05:00:00.000Z",
+              "apiKeyExpirationDays": 365,
+              "description": "Lillies API Key"
+            },
+            "authenticationType": "API_KEY"
+          }
+        }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync"
+    }
+  },
+  "auth": {
+    "lilliesfoodshop": {
+      "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": []
+        },
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "serviceType": "managed"
+    }
+  },
+  "function": {
+    "lilliesBackend": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "lilliesfoodshop"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "hosting": {
+    "amplifyhosting": {
+      "providerPlugin": "awscloudformation",
+      "service": "amplifyhosting",
+      "type": "manual"
+    }
+  }
+}

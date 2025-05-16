@@ -1,0 +1,210 @@
+INFO 2025-05-14 01:39:31,667 autoreload 14776 31728 Watching for file changes with StatReloader
+INFO 2025-05-14 01:41:31,577 autoreload 33996 39192 Watching for file changes with StatReloader
+INFO 2025-05-14 01:45:08,615 autoreload 33996 39192 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 01:45:09,616 autoreload 24988 22740 Watching for file changes with StatReloader
+INFO 2025-05-14 01:45:24,464 autoreload 24988 22740 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 01:45:25,169 autoreload 37768 32736 Watching for file changes with StatReloader
+INFO 2025-05-14 01:46:06,554 autoreload 37768 32736 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 01:46:07,247 autoreload 14144 30660 Watching for file changes with StatReloader
+INFO 2025-05-14 01:46:09,398 autoreload 14144 30660 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 01:46:10,089 autoreload 30116 37760 Watching for file changes with StatReloader
+INFO 2025-05-14 02:13:46,912 autoreload 36332 34356 Watching for file changes with StatReloader
+INFO 2025-05-14 02:30:28,518 autoreload 14540 21880 Watching for file changes with StatReloader
+INFO 2025-05-14 02:31:01,365 autoreload 8328 11368 Watching for file changes with StatReloader
+INFO 2025-05-14 02:31:21,594 basehttp 8328 19548 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-05-14 02:31:22,476 basehttp 8328 38312 "POST /api/auth/login/ HTTP/1.1" 200 638
+INFO 2025-05-14 02:31:22,549 basehttp 8328 8620 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 02:31:22,587 basehttp 8328 38312 "GET /api/dashboard/stats/ HTTP/1.1" 200 2621
+INFO 2025-05-14 02:31:22,862 basehttp 8328 10488 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 02:31:22,881 basehttp 8328 38312 "GET /api/dashboard/stats/ HTTP/1.1" 200 2621
+INFO 2025-05-14 02:33:58,054 autoreload 16332 26128 Watching for file changes with StatReloader
+INFO 2025-05-14 02:34:04,840 basehttp 16332 32192 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 02:34:04,841 basehttp 16332 35276 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 02:34:05,194 basehttp 16332 15296 "GET /api/dashboard/stats/ HTTP/1.1" 200 2621
+INFO 2025-05-14 02:34:05,212 basehttp 16332 15296 "GET /api/dashboard/stats/ HTTP/1.1" 200 2621
+INFO 2025-05-14 02:34:07,839 basehttp 16332 13172 "OPTIONS /api/categories/ HTTP/1.1" 200 0
+INFO 2025-05-14 02:34:07,846 basehttp 16332 15296 "GET /api/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 02:34:08,149 basehttp 16332 10332 "OPTIONS /api/categories/ HTTP/1.1" 200 0
+INFO 2025-05-14 02:34:08,154 basehttp 16332 15296 "GET /api/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 02:34:09,351 basehttp 16332 35444 "OPTIONS /api/products/ HTTP/1.1" 200 0
+INFO 2025-05-14 02:34:09,351 basehttp 16332 18424 "OPTIONS /api/products/ HTTP/1.1" 200 0
+INFO 2025-05-14 02:34:09,364 basehttp 16332 15296 "GET /api/products/ HTTP/1.1" 200 1917
+INFO 2025-05-14 02:34:09,376 basehttp 16332 15296 "GET /api/products/ HTTP/1.1" 200 1917
+INFO 2025-05-14 02:34:09,472 basehttp 16332 15296 "GET /media/products/coca-cola.png HTTP/1.1" 200 122113
+INFO 2025-05-14 02:34:09,477 basehttp 16332 7016 "GET /media/products/fancy-burger.png HTTP/1.1" 200 517849
+INFO 2025-05-14 02:34:09,486 basehttp 16332 15296 "GET /media/products/6723a1cf93ba512237855e35_oklahoma-_2_.png HTTP/1.1" 200 464301
+INFO 2025-05-14 02:34:09,486 basehttp 16332 7016 "GET /media/products/classic-burger.png HTTP/1.1" 200 443569
+INFO 2025-05-14 02:34:12,073 basehttp 16332 13904 "OPTIONS /api/orders/ HTTP/1.1" 200 0
+INFO 2025-05-14 02:34:12,079 basehttp 16332 7016 "GET /api/orders/ HTTP/1.1" 200 2
+INFO 2025-05-14 02:34:12,384 basehttp 16332 7496 "OPTIONS /api/orders/ HTTP/1.1" 200 0
+INFO 2025-05-14 02:34:12,388 basehttp 16332 7016 "GET /api/orders/ HTTP/1.1" 200 2
+INFO 2025-05-14 02:34:17,356 basehttp 16332 37112 "GET /api/menu/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 02:34:17,360 basehttp 16332 37112 "GET /api/menu/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 02:34:17,368 basehttp 16332 37112 "GET /api/menu/items/ HTTP/1.1" 200 1917
+INFO 2025-05-14 02:34:17,375 basehttp 16332 37112 "GET /api/menu/items/ HTTP/1.1" 200 1917
+INFO 2025-05-14 02:41:48,778 autoreload 18288 3188 Watching for file changes with StatReloader
+INFO 2025-05-14 03:17:31,553 autoreload 12956 25148 Watching for file changes with StatReloader
+INFO 2025-05-14 03:19:05,521 autoreload 19804 37596 Watching for file changes with StatReloader
+INFO 2025-05-14 03:30:11,710 autoreload 36776 3132 Watching for file changes with StatReloader
+INFO 2025-05-14 03:55:31,783 autoreload 25720 26356 Watching for file changes with StatReloader
+INFO 2025-05-14 03:56:09,724 autoreload 38180 18724 Watching for file changes with StatReloader
+INFO 2025-05-14 04:28:10,329 basehttp 25720 39728 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-05-14 04:29:04,601 autoreload 22636 33744 Watching for file changes with StatReloader
+INFO 2025-05-14 04:29:14,772 autoreload 12532 7452 Watching for file changes with StatReloader
+INFO 2025-05-14 04:29:23,738 autoreload 24360 16392 Watching for file changes with StatReloader
+INFO 2025-05-14 04:29:30,203 autoreload 18824 20560 Watching for file changes with StatReloader
+INFO 2025-05-14 04:29:40,101 autoreload 22780 29408 Watching for file changes with StatReloader
+INFO 2025-05-14 04:29:46,415 autoreload 33544 5452 Watching for file changes with StatReloader
+INFO 2025-05-14 04:35:48,382 autoreload 25720 26356 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 04:35:48,446 autoreload 38180 18724 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 04:35:48,985 autoreload 36776 3132 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 04:35:49,832 autoreload 24140 34572 Watching for file changes with StatReloader
+INFO 2025-05-14 04:35:49,947 autoreload 32248 34460 Watching for file changes with StatReloader
+INFO 2025-05-14 04:35:50,157 autoreload 10252 38400 Watching for file changes with StatReloader
+WARNING 2025-05-14 04:36:41,117 log 24140 33376 Not Found: /
+WARNING 2025-05-14 04:36:41,117 log 24140 33376 Not Found: /
+WARNING 2025-05-14 04:36:41,118 basehttp 24140 33376 "GET / HTTP/1.1" 404 3716
+INFO 2025-05-14 04:41:06,725 autoreload 36752 20336 Watching for file changes with StatReloader
+INFO 2025-05-14 04:43:17,244 autoreload 27680 33504 Watching for file changes with StatReloader
+INFO 2025-05-14 04:43:52,098 basehttp 24140 1904 "GET /api/ HTTP/1.1" 200 205
+INFO 2025-05-14 04:47:40,662 autoreload 12580 19944 Watching for file changes with StatReloader
+INFO 2025-05-14 04:54:56,046 autoreload 16856 28804 Watching for file changes with StatReloader
+INFO 2025-05-14 05:02:09,388 autoreload 16856 28804 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 05:02:09,467 autoreload 12580 19944 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 05:02:10,290 autoreload 28388 30752 Watching for file changes with StatReloader
+INFO 2025-05-14 05:02:10,290 autoreload 22500 34328 Watching for file changes with StatReloader
+INFO 2025-05-14 05:10:25,825 basehttp 28388 39272 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:11:36,907 autoreload 28388 30752 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\middleware.py changed, reloading.
+INFO 2025-05-14 05:11:37,746 autoreload 32392 35928 Watching for file changes with StatReloader
+INFO 2025-05-14 05:11:43,269 autoreload 32392 35928 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\middleware.py changed, reloading.
+INFO 2025-05-14 05:11:43,917 autoreload 2420 34136 Watching for file changes with StatReloader
+INFO 2025-05-14 05:12:16,429 basehttp 2420 32440 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:12:17,636 basehttp 2420 35904 "POST /api/auth/login/ HTTP/1.1" 200 638
+INFO 2025-05-14 05:12:17,776 basehttp 2420 37864 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:12:22,232 autoreload 2420 34136 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 05:12:22,969 autoreload 5364 31088 Watching for file changes with StatReloader
+INFO 2025-05-14 05:12:34,356 basehttp 5364 10832 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:12:34,998 autoreload 33280 37540 Watching for file changes with StatReloader
+INFO 2025-05-14 05:12:35,490 basehttp 5364 26776 "POST /api/auth/login/ HTTP/1.1" 200 638
+INFO 2025-05-14 05:12:35,647 basehttp 5364 19604 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:12:37,813 basehttp 5364 23652 "OPTIONS /api/orders/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:12:38,875 basehttp 5364 8344 "OPTIONS /api/admin/users/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:12:43,585 basehttp 5364 28948 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:13:03,096 basehttp 5364 24360 "OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+WARNING 2025-05-14 05:13:03,497 log 5364 18824 Bad Request: /api/auth/register/
+WARNING 2025-05-14 05:13:03,497 log 5364 18824 Bad Request: /api/auth/register/
+WARNING 2025-05-14 05:13:03,500 basehttp 5364 18824 "POST /api/auth/register/ HTTP/1.1" 400 58
+INFO 2025-05-14 05:13:15,445 basehttp 5364 36100 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:13:16,563 basehttp 5364 12420 "POST /api/auth/login/ HTTP/1.1" 200 638
+INFO 2025-05-14 05:13:16,728 basehttp 5364 4628 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:13:18,427 basehttp 5364 36788 "OPTIONS /api/categories/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:15:22,913 basehttp 5364 17820 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:15:58,140 basehttp 5364 9820 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:16:28,208 basehttp 5364 37864 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:16:42,290 autoreload 5364 31088 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 05:16:42,362 autoreload 33280 37540 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 05:16:43,210 autoreload 23040 37984 Watching for file changes with StatReloader
+INFO 2025-05-14 05:16:58,135 basehttp 10948 10832 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:17:07,578 autoreload 23040 37984 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\middleware.py changed, reloading.
+INFO 2025-05-14 05:17:07,632 autoreload 10948 4032 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\middleware.py changed, reloading.
+INFO 2025-05-14 05:17:08,653 autoreload 27124 33476 Watching for file changes with StatReloader
+INFO 2025-05-14 05:17:08,685 autoreload 36304 24820 Watching for file changes with StatReloader
+INFO 2025-05-14 05:17:27,252 autoreload 22844 19548 Watching for file changes with StatReloader
+INFO 2025-05-14 05:17:28,128 basehttp 27124 13572 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:17:37,988 autoreload 27124 33476 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\middleware.py changed, reloading.
+INFO 2025-05-14 05:17:38,002 autoreload 36304 24820 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\middleware.py changed, reloading.
+INFO 2025-05-14 05:17:38,230 autoreload 22844 19548 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\middleware.py changed, reloading.
+INFO 2025-05-14 05:17:38,994 autoreload 30560 12700 Watching for file changes with StatReloader
+INFO 2025-05-14 05:17:39,017 autoreload 25156 37956 Watching for file changes with StatReloader
+INFO 2025-05-14 05:17:39,176 autoreload 37344 34192 Watching for file changes with StatReloader
+INFO 2025-05-14 05:21:18,793 autoreload 19852 12528 Watching for file changes with StatReloader
+INFO 2025-05-14 05:24:11,127 basehttp 25156 8848 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:24:12,380 basehttp 25156 13480 "POST /api/auth/login/ HTTP/1.1" 200 638
+INFO 2025-05-14 05:24:17,565 basehttp 25156 19472 "OPTIONS /api/admin/users/ HTTP/1.1" 200 0
+INFO 2025-05-14 05:27:23,814 autoreload 16552 26432 Watching for file changes with StatReloader
+INFO 2025-05-14 05:28:01,692 autoreload 16552 26432 C:\Users\Julius\lillies-food-shop\lillies-food-shop\django_backend\lillies_backend\settings.py changed, reloading.
+INFO 2025-05-14 05:28:02,306 autoreload 33132 6584 Watching for file changes with StatReloader
+INFO 2025-05-14 05:35:08,241 basehttp 33132 20352 "POST /api/auth/login/ HTTP/1.1" 200 638
+INFO 2025-05-14 08:35:22,458 autoreload 15160 35064 Watching for file changes with StatReloader
+INFO 2025-05-14 13:16:18,657 autoreload 30020 13052 Watching for file changes with StatReloader
+INFO 2025-05-14 13:19:15,591 autoreload 32228 31700 Watching for file changes with StatReloader
+INFO 2025-05-14 13:19:29,334 basehttp 32228 29368 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-05-14 13:19:30,756 basehttp 32228 30812 "POST /api/auth/login/ HTTP/1.1" 200 638
+INFO 2025-05-14 13:19:30,839 basehttp 32228 33744 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 13:19:30,928 basehttp 32228 30812 "GET /api/dashboard/stats/ HTTP/1.1" 200 2621
+INFO 2025-05-14 13:19:31,148 basehttp 32228 19684 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 13:19:31,182 basehttp 32228 30812 "GET /api/dashboard/stats/ HTTP/1.1" 200 2621
+INFO 2025-05-14 13:19:33,060 basehttp 32228 29252 "OPTIONS /api/categories/ HTTP/1.1" 200 0
+INFO 2025-05-14 13:19:33,060 basehttp 32228 1504 "OPTIONS /api/categories/ HTTP/1.1" 200 0
+INFO 2025-05-14 13:19:33,068 basehttp 32228 30812 "GET /api/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 13:19:33,075 basehttp 32228 30812 "GET /api/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 13:19:34,008 basehttp 32228 22064 "OPTIONS /api/products/ HTTP/1.1" 200 0
+INFO 2025-05-14 13:19:34,026 basehttp 32228 30812 "GET /api/products/ HTTP/1.1" 200 1917
+INFO 2025-05-14 13:19:34,314 basehttp 32228 26188 "OPTIONS /api/products/ HTTP/1.1" 200 0
+INFO 2025-05-14 13:19:34,330 basehttp 32228 30812 "GET /api/products/ HTTP/1.1" 200 1917
+INFO 2025-05-14 13:19:35,416 basehttp 32228 33628 "OPTIONS /api/admin/users/ HTTP/1.1" 200 0
+INFO 2025-05-14 13:19:35,416 basehttp 32228 32236 "OPTIONS /api/admin/users/ HTTP/1.1" 200 0
+INFO 2025-05-14 13:19:35,423 basehttp 32228 30812 "GET /api/admin/users/ HTTP/1.1" 200 617
+INFO 2025-05-14 13:19:35,433 basehttp 32228 30812 "GET /api/admin/users/ HTTP/1.1" 200 617
+INFO 2025-05-14 13:21:32,290 basehttp 32228 33144 "OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+WARNING 2025-05-14 13:21:32,379 log 32228 30812 Bad Request: /api/auth/register/
+WARNING 2025-05-14 13:21:32,379 log 32228 30812 Bad Request: /api/auth/register/
+WARNING 2025-05-14 13:21:32,379 basehttp 32228 30812 "POST /api/auth/register/ HTTP/1.1" 400 45
+INFO 2025-05-14 13:21:51,197 basehttp 32228 30812 "POST /api/auth/register/ HTTP/1.1" 201 681
+INFO 2025-05-14 13:22:06,300 basehttp 32228 30812 "POST /api/auth/login/ HTTP/1.1" 200 646
+INFO 2025-05-14 13:22:54,683 basehttp 32228 30812 "POST /api/auth/login/ HTTP/1.1" 200 638
+INFO 2025-05-14 13:22:54,776 basehttp 32228 30812 "GET /api/dashboard/stats/ HTTP/1.1" 200 2621
+INFO 2025-05-14 13:22:54,856 basehttp 32228 30812 "GET /api/dashboard/stats/ HTTP/1.1" 200 2621
+INFO 2025-05-14 13:23:01,839 basehttp 32228 22120 "GET /api/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 13:23:01,863 basehttp 32228 22120 "GET /api/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 13:23:04,821 basehttp 32228 21324 "GET /api/admin/users/ HTTP/1.1" 200 767
+INFO 2025-05-14 13:23:04,844 basehttp 32228 21324 "GET /api/admin/users/ HTTP/1.1" 200 767
+INFO 2025-05-14 13:23:44,486 basehttp 32228 17264 "GET /api/menu/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 13:23:44,496 basehttp 32228 17264 "GET /api/menu/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 13:23:44,507 basehttp 32228 17264 "GET /api/menu/items/ HTTP/1.1" 200 1917
+INFO 2025-05-14 13:23:44,519 basehttp 32228 17264 "GET /api/menu/items/ HTTP/1.1" 200 1917
+INFO 2025-05-14 13:24:09,280 basehttp 32228 17264 "POST /api/auth/login/ HTTP/1.1" 200 646
+INFO 2025-05-14 13:24:27,017 basehttp 32228 17264 "GET /api/menu/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 13:24:27,038 basehttp 32228 17264 "GET /api/menu/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 13:24:27,039 basehttp 32228 11716 "GET /api/menu/items/ HTTP/1.1" 200 1917
+INFO 2025-05-14 13:24:27,056 basehttp 32228 11716 "GET /api/menu/items/ HTTP/1.1" 200 1917
+INFO 2025-05-14 14:18:25,333 basehttp 32228 21544 "POST /api/auth/login/ HTTP/1.1" 200 638
+INFO 2025-05-14 14:18:25,402 basehttp 32228 21544 "GET /api/dashboard/stats/ HTTP/1.1" 200 2621
+INFO 2025-05-14 14:18:25,433 basehttp 32228 21544 "GET /api/dashboard/stats/ HTTP/1.1" 200 2621
+INFO 2025-05-14 14:18:28,502 basehttp 32228 21544 "GET /api/admin/users/ HTTP/1.1" 200 767
+INFO 2025-05-14 14:18:28,511 basehttp 32228 21544 "GET /api/admin/users/ HTTP/1.1" 200 767
+INFO 2025-05-14 14:23:47,798 basehttp 32228 16568 "OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+INFO 2025-05-14 14:23:49,018 basehttp 32228 30044 "POST /api/auth/register/ HTTP/1.1" 201 698
+INFO 2025-05-14 14:23:58,405 basehttp 32228 30348 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-05-14 14:23:59,260 basehttp 32228 30044 "POST /api/auth/login/ HTTP/1.1" 200 691
+INFO 2025-05-14 14:24:15,054 basehttp 32228 30044 "GET /api/menu/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 14:24:15,061 basehttp 32228 30044 "GET /api/menu/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 14:24:15,071 basehttp 32228 27700 "GET /api/menu/items/ HTTP/1.1" 200 1917
+INFO 2025-05-14 14:24:15,081 basehttp 32228 27700 "GET /api/menu/items/ HTTP/1.1" 200 1917
+INFO 2025-05-14 14:24:46,597 basehttp 32228 27700 "POST /api/auth/login/ HTTP/1.1" 200 691
+INFO 2025-05-14 14:24:55,264 basehttp 32228 27700 "GET /api/menu/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 14:24:55,283 basehttp 32228 27700 "GET /api/menu/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 14:24:55,292 basehttp 32228 30044 "GET /api/menu/items/ HTTP/1.1" 200 1917
+INFO 2025-05-14 14:24:55,307 basehttp 32228 30044 "GET /api/menu/items/ HTTP/1.1" 200 1917
+INFO 2025-05-14 14:25:17,927 basehttp 32228 30044 "POST /api/auth/login/ HTTP/1.1" 200 638
+INFO 2025-05-14 14:25:18,279 basehttp 32228 30028 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 14:25:18,280 basehttp 32228 3136 "OPTIONS /api/dashboard/stats/ HTTP/1.1" 200 0
+INFO 2025-05-14 14:25:18,324 basehttp 32228 30044 "GET /api/dashboard/stats/ HTTP/1.1" 200 2621
+INFO 2025-05-14 14:25:18,369 basehttp 32228 30044 "GET /api/dashboard/stats/ HTTP/1.1" 200 2621
+INFO 2025-05-14 14:25:20,887 basehttp 32228 12992 "OPTIONS /api/products/ HTTP/1.1" 200 0
+INFO 2025-05-14 14:25:20,904 basehttp 32228 30044 "GET /api/products/ HTTP/1.1" 200 1917
+INFO 2025-05-14 14:25:21,197 basehttp 32228 29512 "OPTIONS /api/products/ HTTP/1.1" 200 0
+INFO 2025-05-14 14:25:21,215 basehttp 32228 30044 "GET /api/products/ HTTP/1.1" 200 1917
+INFO 2025-05-14 14:25:23,462 basehttp 32228 30860 "OPTIONS /api/categories/ HTTP/1.1" 200 0
+INFO 2025-05-14 14:25:23,462 basehttp 32228 33248 "OPTIONS /api/categories/ HTTP/1.1" 200 0
+INFO 2025-05-14 14:25:23,469 basehttp 32228 30044 "GET /api/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 14:25:23,476 basehttp 32228 30044 "GET /api/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 14:26:05,404 basehttp 32228 30044 "POST /api/products/ HTTP/1.1" 201 463
+INFO 2025-05-14 14:26:05,458 basehttp 32228 30044 "GET /api/products/ HTTP/1.1" 200 2381
+INFO 2025-05-14 14:26:05,483 basehttp 32228 30044 "GET /api/products/ HTTP/1.1" 200 2381
+INFO 2025-05-14 14:26:05,609 basehttp 32228 27700 "GET /media/products/golden-fries.png HTTP/1.1" 200 382842
+INFO 2025-05-14 14:26:12,638 basehttp 32228 27700 "GET /api/menu/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 14:26:12,654 basehttp 32228 27700 "GET /api/menu/categories/ HTTP/1.1" 200 436
+INFO 2025-05-14 14:26:12,665 basehttp 32228 30044 "GET /api/menu/items/ HTTP/1.1" 200 2381
+INFO 2025-05-14 14:26:12,684 basehttp 32228 27700 "GET /media/products/golden-fries.png HTTP/1.1" 304 0
+INFO 2025-05-14 14:26:12,692 basehttp 32228 30044 "GET /api/menu/items/ HTTP/1.1" 200 2381

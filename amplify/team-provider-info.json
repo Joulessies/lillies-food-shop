@@ -1,0 +1,61 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-lilliesfoodshop-dev-33362-authRole",
+      "UnauthRoleArn": "arn:aws:iam::929999318268:role/amplify-lilliesfoodshop-dev-33362-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::929999318268:role/amplify-lilliesfoodshop-dev-33362-authRole",
+      "Region": "ap-northeast-1",
+      "DeploymentBucketName": "amplify-lilliesfoodshop-dev-33362-deployment",
+      "UnauthRoleName": "amplify-lilliesfoodshop-dev-33362-unauthRole",
+      "StackName": "amplify-lilliesfoodshop-dev-33362",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:929999318268:stack/amplify-lilliesfoodshop-dev-33362/54ef2960-3042-11f0-aca0-0ed208b5edb5",
+      "AmplifyAppId": "d34itxlmfwcuij",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-lilliesfoodshop-dev-33362-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
+    },
+    "categories": {
+      "function": {
+        "lilliesfoodshop09e6cafe": {},
+        "lilliesBackend": {},
+        "lilliesfoodshop": {}
+      },
+      "auth": {
+        "lilliesfoodshop": {}
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d34itxlmfwcuij",
+          "type": "manual"
+        }
+      }
+    }
+  },
+  "backend": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-lilliesfoodshop-backend-e799f-authRole",
+      "UnauthRoleArn": "arn:aws:iam::929999318268:role/amplify-lilliesfoodshop-backend-e799f-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::929999318268:role/amplify-lilliesfoodshop-backend-e799f-authRole",
+      "Region": "ap-northeast-1",
+      "DeploymentBucketName": "amplify-lilliesfoodshop-backend-e799f-deployment",
+      "UnauthRoleName": "amplify-lilliesfoodshop-backend-e799f-unauthRole",
+      "StackName": "amplify-lilliesfoodshop-backend-e799f",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:929999318268:stack/amplify-lilliesfoodshop-backend-e799f/54a7cab0-3043-11f0-b49e-0a8944a8fdc5",
+      "AmplifyAppId": "d34itxlmfwcuij",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-lilliesfoodshop-backend-e799f-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
+    },
+    "categories": {
+      "auth": {
+        "lilliesfoodshop": {}
+      },
+      "function": {
+        "lilliesfoodshop09e6cafe": {},
+        "lilliesfoodshop0d15d09f": {}
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d34itxlmfwcuij",
+          "type": "manual"
+        }
+      }
+    }
+  }
+}

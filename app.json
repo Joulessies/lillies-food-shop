@@ -1,0 +1,25 @@
+{
+  "name": "Lillies Food Shop",
+  "description": "Django backend for Lillies Food Shop",
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "DEBUG": {
+      "value": "False"
+    },
+    "SECRET_KEY": {
+      "generator": "secret"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "scripts": {
+    "postdeploy": "cd django_backend && python manage.py migrate"
+  }
+}

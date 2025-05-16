@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    body {
+      font-family: system-ui, sans-serif, Arial;
+      line-height: 1.6;
+      color: #333;
+      padding: 14px 8px;
+      background-color: #f5f5f5;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: #fff;
+    }
+
+    .header {
+      border-top: 6px solid #458500;
+      padding: 16px;
+    }
+
+    .logo-container {
+      text-decoration: none;
+      outline: none;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .logo {
+      height: 32px;
+      vertical-align: middle;
+    }
+
+    .header-text {
+      font-size: 16px;
+      vertical-align: middle;
+      border-left: 1px solid #333;
+      padding-left: 8px;
+    }
+
+    .content {
+      padding: 0 16px;
+    }
+
+    .order-id {
+      text-align: left;
+      font-size: 14px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid #333;
+    }
+
+    .order-item {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .item-image-cell {
+      padding: 24px 8px 0 4px;
+      display: inline-block;
+      width: max-content;
+    }
+
+    .item-image {
+      height: 64px;
+    }
+
+    .item-details {
+      padding: 24px 8px 0 8px;
+      width: 100%;
+    }
+
+    .item-quantity {
+      font-size: 14px;
+      color: #888;
+      padding-top: 4px;
+    }
+
+    .item-price {
+      padding: 24px 4px 0 0;
+      white-space: nowrap;
+    }
+
+    .divider {
+      padding: 24px 0;
+    }
+
+    .divider-line {
+      border-top: 2px solid #333;
+    }
+
+    .cost-summary {
+      border-collapse: collapse;
+      width: 100%;
+      text-align: right;
+    }
+
+    .cost-label {
+      padding: 8px 0;
+    }
+
+    .cost-value {
+      padding: 8px;
+      white-space: nowrap;
+    }
+
+    .total-row {
+      border-top: 2px solid #333;
+    }
+
+    .total-value {
+      padding: 16px 8px;
+      white-space: nowrap;
+    }
+
+    .footer {
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .footer-text {
+      color: #999;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <a class="logo-container" href="https://lilliesfood.shop" target="_blank"></a> <img class="logo"
+        src="cid:logo.png" alt="logo" />
+      <img class="logo"
+        src="data:image/png;base64,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"
+        alt="Lillies Food Shop" />
+      </a>
+      <span class="header-text">
+        <strong>Thank You for Your Order</strong>
+      </span>
+    </div>
+    <div class="content">
+      <p>We'll send you tracking information when the order ships.</p>
+      <div class="order-id">
+        <strong>Order # {{ order_id }}</strong>
+      </div>
+
+      {% for item in items %}
+      <table class="order-item">
+        <tr style="vertical-align: top">
+          <td class="item-image-cell">
+            <img class="item-image" src="{{ item.image_url|default:'https://via.placeholder.com/64x64' }}" alt="item" />
+          </td>
+          <td class="item-details">
+            <div>{{ item.name }}</div>
+            <div class="item-quantity">QTY: {{ item.quantity }}</div>
+          </td>
+          <td class="item-price">
+            <strong>₱{{ item.price }}</strong>
+          </td>
+        </tr>
+      </table>
+      {% endfor %}
+
+      <div class="divider">
+        <div class="divider-line"></div>
+      </div>
+
+      <table class="cost-summary">
+        <tr>
+          <td style="width: 60%"></td>
+          <td class="cost-label">Shipping</td>
+          <td class="cost-value">{% if delivery_method == 'delivery' %}₱50.00{% else %}₱0.00{% endif %}</td>
+        </tr>
+        <tr>
+          <td style="width: 60%"></td>
+          <td class="cost-label">Taxes</td>
+          <td class="cost-value">₱{{ tax|default:'0.00' }}</td>
+        </tr>
+        <tr>
+          <td style="width: 60%"></td>
+          <td class="cost-label total-row">
+            <strong>Order Total</strong>
+          </td>
+          <td class="total-value total-row">
+            <strong>₱{{ total }}</strong>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="footer">
+    <p class="footer-text">
+      The email was sent to {{ customer_email }}<br />
+      You received this email because you placed the order
+    </p>
+  </div>
+</body>
+
+</html>

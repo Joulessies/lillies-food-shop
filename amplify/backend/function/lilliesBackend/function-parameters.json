@@ -1,0 +1,17 @@
+{
+  "lambdaLayers": [],
+  "permissions": {
+    "storage": {
+      "Order:@model(appsync)": ["create", "read", "update", "delete"],
+      "Product:@model(appsync)": ["create", "read", "update", "delete"],
+      "User:@model(appsync)": ["create", "read", "update", "delete"]
+    },
+    "auth": {
+      "lilliesfoodshop": ["create", "read", "update", "delete"]
+    }
+  },
+  "environmentMap": {
+    "DEBUG": "False",
+    "ALLOWED_HOSTS": "*"
+  }
+}

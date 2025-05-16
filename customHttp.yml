@@ -1,0 +1,26 @@
+customHeaders:
+  - pattern: "**/*"
+    headers:
+      - key: "Cache-Control"
+        value: "public, max-age=0, must-revalidate"
+  - pattern: "/api/**/*"
+    headers:
+      - key: "Access-Control-Allow-Origin"
+        value: "*"
+      - key: "Access-Control-Allow-Headers"
+        value: "*"
+      - key: "Access-Control-Allow-Methods"
+        value: "GET, POST, PUT, DELETE, OPTIONS"
+
+# Route all non-API requests to index.html for SPA client-side routing
+rewrites:
+  # First, explicitly define API routes to be exempted from the SPA fallback
+  - source: "/api/**"
+    destination: "/api/:splat"
+    status: 200
+
+  # This regex pattern matches all routes that don't have a file extension
+  # or have extensions that are not in the list, and forwards them to index.html
+  - source: "</^[^.]+$|\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|woff2|ttf|map|json)$)([^.]+$)/"
+    destination: "/index.html"
+    status: "200"

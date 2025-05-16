@@ -1,0 +1,49 @@
+version: 1
+backend:
+  phases:
+    preBuild:
+      commands:
+        - export AMPLIFY_SKIP_APP_ID_MISMATCH_CHECK=true
+        - npm install -g @aws-amplify/cli
+        - |
+          # Configure AWS credentials directly
+          aws configure set aws_access_key_id ${ACCESS_KEY_ID} --profile amplify
+          aws configure set aws_secret_access_key ${SECRET_ACCESS_KEY} --profile amplify
+          aws configure set region ${REGION:-ap-northeast-1} --profile amplify
+          aws configure set output json --profile amplify
+
+          # Set AWS_PROFILE for Amplify CLI
+          export AWS_PROFILE=amplify
+
+          # Verify AWS configuration
+          aws sts get-caller-identity --profile amplify
+
+          # Initialize Amplify with profile
+          amplify configure --yes --profile amplify
+        - chmod +x ./amplify-init.sh
+        - ./amplify-init.sh
+    build:
+      commands:
+        - cd django_backend
+        - pip install -r requirements.txt
+        - python manage.py collectstatic --no-input
+        - cd ..
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - node_modules/**/*
+  env:
+    variables:
+      NODE_ENV: "production"
+      REACT_APP_API_BASE_URL: "${API_URL}"

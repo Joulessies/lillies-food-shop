@@ -1,0 +1,14 @@
+{
+  "httpMethod": "GET",
+  "path": "/api/products/",
+  "headers": {
+    "Host": "example.com",
+    "X-Forwarded-For": "127.0.0.1",
+    "X-Forwarded-Proto": "https",
+    "X-Forwarded-Port": "443",
+    "Content-Type": "application/json"
+  },
+  "queryStringParameters": {},
+  "body": "",
+  "isBase64Encoded": false
+}

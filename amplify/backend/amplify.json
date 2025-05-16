@@ -1,0 +1,10 @@
+{
+  "features": {
+    "graphqltransformer": {
+      "transformerversion": 1
+    },
+    "keytransformer": {
+      "transformerversion": 1
+    }
+  }
+}

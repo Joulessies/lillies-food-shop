@@ -1,0 +1,451 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Parameters": {
+    "CloudWatchRule": {
+      "Type": "String",
+      "Default": "NONE",
+      "Description": "Enter CloudWatch Events Rule Name for the scheduled rule"
+    },
+    "deploymentBucketName": {
+      "Type": "String"
+    },
+    "env": {
+      "Type": "String"
+    },
+    "s3Key": {
+      "Type": "String"
+    },
+    "authLilliesfoodshopUserPoolId": {
+      "Type": "String",
+      "Default": "authLilliesfoodshopUserPoolId"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Metadata": {
+        "aws:asset:path": "./src",
+        "aws:asset:property": "Code"
+      },
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": {
+            "Ref": "s3Key"
+          }
+        },
+        "Handler": "lambda_handler.lambda_handler",
+        "FunctionName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "lilliesBackend",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "lilliesBackend",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "ENV": {
+              "Ref": "env"
+            },
+            "DEBUG": "False",
+            "ALLOWED_HOSTS": "*",
+            "AUTH_USER_POOL_ID": {
+              "Ref": "authLilliesfoodshopUserPoolId"
+            }
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.8",
+        "Layers": [],
+        "Timeout": 25
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "lilliesfoodshopLambdaRole",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "lilliesfoodshopLambdaRole",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "cloudwatchlogs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
+                      {
+                        "region": {
+                          "Ref": "AWS::Region"
+                        },
+                        "account": {
+                          "Ref": "AWS::AccountId"
+                        },
+                        "lambda": {
+                          "Ref": "LambdaFunction"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "AmplifyResourcesPolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "cognito-idp:ConfirmSignUp",
+                "cognito-idp:AdminCreateUser",
+                "cognito-idp:CreateUserImportJob",
+                "cognito-idp:AdminSetUserSettings",
+                "cognito-idp:AdminLinkProviderForUser",
+                "cognito-idp:CreateIdentityProvider",
+                "cognito-idp:AdminConfirmSignUp",
+                "cognito-idp:AdminDisableUser",
+                "cognito-idp:AdminRemoveUserFromGroup",
+                "cognito-idp:SetUserMFAPreference",
+                "cognito-idp:SetUICustomization",
+                "cognito-idp:SignUp",
+                "cognito-idp:VerifyUserAttribute",
+                "cognito-idp:SetRiskConfiguration",
+                "cognito-idp:StartUserImportJob",
+                "cognito-idp:AdminSetUserPassword",
+                "cognito-idp:AssociateSoftwareToken",
+                "cognito-idp:CreateResourceServer",
+                "cognito-idp:RespondToAuthChallenge",
+                "cognito-idp:CreateUserPoolClient",
+                "cognito-idp:AdminUserGlobalSignOut",
+                "cognito-idp:GlobalSignOut",
+                "cognito-idp:AddCustomAttributes",
+                "cognito-idp:CreateGroup",
+                "cognito-idp:CreateUserPool",
+                "cognito-idp:AdminForgetDevice",
+                "cognito-idp:AdminAddUserToGroup",
+                "cognito-idp:AdminRespondToAuthChallenge",
+                "cognito-idp:ForgetDevice",
+                "cognito-idp:CreateUserPoolDomain",
+                "cognito-idp:AdminEnableUser",
+                "cognito-idp:AdminUpdateDeviceStatus",
+                "cognito-idp:StopUserImportJob",
+                "cognito-idp:InitiateAuth",
+                "cognito-idp:AdminInitiateAuth",
+                "cognito-idp:AdminSetUserMFAPreference",
+                "cognito-idp:SetUserSettings",
+                "cognito-idp:VerifySoftwareToken",
+                "cognito-idp:AdminDisableProviderForUser",
+                "cognito-idp:SetUserPoolMfaConfig",
+                "cognito-idp:ChangePassword",
+                "cognito-idp:ConfirmDevice",
+                "cognito-idp:AdminResetUserPassword",
+                "cognito-idp:ResendConfirmationCode"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:cognito-idp:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":userpool/",
+                      {
+                        "Ref": "authLilliesfoodshopUserPoolId"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "LambdaApiGatewayExecutionPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "LambdaFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "LilliesRestApi"
+              },
+              "/*/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "LilliesRestApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "LilliesRestApi",
+        "Description": "API Gateway for Lillies Food Shop Backend",
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }
+      }
+    },
+    "ProxyResource": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "LilliesRestApi"
+        },
+        "ParentId": {
+          "Fn::GetAtt": [
+            "LilliesRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "{proxy+}"
+      }
+    },
+    "ProxyMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "LilliesRestApi"
+        },
+        "ResourceId": {
+          "Ref": "ProxyResource"
+        },
+        "HttpMethod": "ANY",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "LambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "RootMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "LilliesRestApi"
+        },
+        "ResourceId": {
+          "Fn::GetAtt": [
+            "LilliesRestApi",
+            "RootResourceId"
+          ]
+        },
+        "HttpMethod": "ANY",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "LambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "ApiGatewayDeployment": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "DependsOn": [
+        "ProxyMethod",
+        "RootMethod"
+      ],
+      "Properties": {
+        "RestApiId": {
+          "Ref": "LilliesRestApi"
+        },
+        "StageName": "prod"
+      }
+    }
+  },
+  "Outputs": {
+    "Name": {
+      "Value": {
+        "Ref": "LambdaFunction"
+      }
+    },
+    "Arn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaFunction",
+          "Arn"
+        ]
+      }
+    },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Value": {
+        "Ref": "LambdaExecutionRole"
+      }
+    },
+    "ApiEndpoint": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "LilliesRestApi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".amazonaws.com/prod"
+          ]
+        ]
+      }
+    },
+    "LambdaExecutionRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaExecutionRole",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: lillies-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn lillies_backend.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://main.d1tks6esoyf2em.amplifyapp.com
+      - key: DATABASE_URL
+        fromDatabase:
+          name: lillies-db
+          property: connectionString
