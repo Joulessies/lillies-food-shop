@@ -20,6 +20,12 @@
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "devDependencies": {},
-  "keywords": []
+  "devDependencies": {
+    "vite": "^6.3.5"
+  },
+  "keywords": [],
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
 }
