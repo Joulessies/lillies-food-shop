@@ -1,2 +1,30 @@
+# Zip files
 lambda_*.zip
 *.zip
+
+# Environment files
+.env
+.npmrc
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# AWS deployment files
+.ebextensions/
+.elasticbeanstalk/
+
+# IDE files
+.vscode/
+.idea/
+
+# Build outputs
+dist/
+build/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Dependencies
+node_modules/
